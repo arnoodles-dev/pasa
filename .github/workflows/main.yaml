@@ -1,6 +1,6 @@
 name: pasa
 
-on: [pull_request, push]
+on: [push]
 
 jobs:
   verify-semantic-pull-request:
@@ -21,7 +21,7 @@ jobs:
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: $
+          flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - name: 📦 Install Dependencies
         run: flutter pub get
