@@ -43,7 +43,7 @@ jobs:
         run: flutter test --dart-define=CI=true --coverage
         
       - name: 📤 Upload Failed Goldens
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: goldens-failures
