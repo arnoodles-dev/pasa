@@ -9,7 +9,7 @@ jobs:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
 
   build:
-    runs-on: "ubuntu-latest"
+    runs-on: "macos-latest"
 
     steps:
       - name: 📚 Git Checkout
