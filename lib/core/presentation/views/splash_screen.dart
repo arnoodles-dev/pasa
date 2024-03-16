@@ -37,7 +37,7 @@ class SplashScreen extends HookWidget {
         content: Padding(
           padding: const EdgeInsets.symmetric(horizontal: Insets.medium),
           child: Text(
-            context.l10n.common_error_unsupported_device,
+            context.i18n.common_error_unsupported_device,
             style: TextStyle(color: context.colorScheme.onBackground),
           ),
         ),

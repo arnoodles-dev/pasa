@@ -1,0 +1,64 @@
+name: Build [Dev] Android
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+  BUILD_NUMBER: ${{ github.run_number }}
+
+
+jobs:
+  Setup:
+    permissions: read-all
+    runs-on: macos-latest
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get Flutter SDK version from fvm_config.json
+        uses: kuhnroyal/flutter-fvm-config-action@v1
+        with:
+          path: .fvm/fvm_config.json
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: ⚙️ Build Project
+        run: make rebuild
+
+      - name: Get last successful commit
+        uses: nrwl/last-successful-commit-action@v1
+        id: last_successful_commit
+        with:
+          branch: ${{ github.ref_name }}
+          workflow_id: build_dev_qa.yaml
+          github_token: ${{ secrets.TOKEN }}
+
+      - name: Prepare release notes
+        run: sh scripts/release_notes_qa_dev.sh ${{ steps.last_successful_commit.outputs.commit_hash }} ${{ github.ref_name }} ${{ github.run_number }}
+
+  Deploy-Android:
+    permissions: read-all
+    runs-on: macos-latest
+    needs: [ Setup ]
+    steps:
+      - name: Build Version branch
+        run:  make build_android_dev   
+
+      - name: Deploy Apk to Firebase Dev
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: 1:75714035386:android:e275384df920f4612c0c83
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CREDENTIALS }}
+          releaseNotesFile: dev_notes.txt
+          file: outputs/dev.apk
+  
+       

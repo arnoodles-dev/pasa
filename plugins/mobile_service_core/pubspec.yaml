@@ -1,0 +1,19 @@
+name: mobile_service_core
+description: A Flutter Mobile Service Core Plugin.
+version: 1.0.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.19.3"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_local_notifications: ^17.0.0
+  very_good_analysis: ^5.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+

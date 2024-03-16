@@ -18,7 +18,7 @@ class PostContainerFooter extends StatelessWidget {
           _FooterItems(
             leftIcon: Icons.arrow_upward_rounded,
             value: post.upvotes.getOrCrash() == 0
-                ? context.l10n.post__upvotes_default_value__vote
+                ? context.i18n.post__upvotes_default_value__vote
                 : post.upvotes.getOrCrash().toString(),
             rightIcon: Icons.arrow_downward_rounded,
           ),

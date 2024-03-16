@@ -30,4 +30,6 @@ class Failure with _$Failure {
   const factory Failure.storageError() = StorageError;
 
   const factory Failure.userNotFound() = UserNotFound;
+
+  const factory Failure.remoteConfigError() = RemoteConfigError;
 }

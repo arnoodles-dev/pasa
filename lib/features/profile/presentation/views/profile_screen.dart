@@ -158,7 +158,7 @@ class _ProfileContent extends StatelessWidget {
               ),
             ),
             PasaButton(
-              text: context.l10n.profile__button_text__logout,
+              text: context.i18n.profile__button_text__logout,
               isExpanded: true,
               buttonType: ButtonType.filled,
               onPressed: () => context.read<AuthBloc>().logout(),
@@ -186,27 +186,27 @@ class _ProfileDetails extends StatelessWidget {
         children: <Widget>[
           Gap.small(),
           PasaInfoTextField(
-            title: context.l10n.profile__label_text__email,
+            title: context.i18n.profile__label_text__email,
             description: user.email.getOrCrash(),
           ),
           Gap.small(),
           PasaInfoTextField(
-            title: context.l10n.profile__label_text__phone_number,
+            title: context.i18n.profile__label_text__phone_number,
             description: user.contactNumber.getOrCrash(),
           ),
           Gap.small(),
           PasaInfoTextField(
-            title: context.l10n.profile__label_text__gender,
+            title: context.i18n.profile__label_text__gender,
             description: user.gender.name.capitalize(),
           ),
           Gap.small(),
           PasaInfoTextField(
-            title: context.l10n.profile__label_text__birthday,
+            title: context.i18n.profile__label_text__birthday,
             description: user.birthday.defaultFormat(),
           ),
           Gap.small(),
           PasaInfoTextField(
-            title: context.l10n.profile__label_text__age,
+            title: context.i18n.profile__label_text__age,
             description: user.age,
           ),
         ],

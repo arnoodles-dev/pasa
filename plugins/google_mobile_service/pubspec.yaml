@@ -1,0 +1,27 @@
+name: mobile_service
+description: A Flutter Google Mobile Service Plugin.
+version: 1.0.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.19.3"
+
+dependencies:
+  crypto: ^3.0.3
+  firebase_analytics: ^10.8.10
+  firebase_core: ^2.27.1
+  firebase_crashlytics: ^3.4.19
+  firebase_performance: ^0.9.3+18
+  firebase_remote_config: ^4.3.18
+  flutter:
+    sdk: flutter
+  mobile_service_core:
+    path: ../mobile_service_core
+  very_good_analysis: ^5.1.0  
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+

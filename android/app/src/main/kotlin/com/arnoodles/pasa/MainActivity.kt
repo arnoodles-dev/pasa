@@ -1,4 +1,4 @@
-package com.arnoodles.pasa.pasa
+package com.arnoodles.pasa
 
 import io.flutter.embedding.android.FlutterActivity
 

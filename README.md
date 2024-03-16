@@ -188,7 +188,7 @@ import 'package:pasa/app/utils/extensions.dart';
 
 @override
 Widget build(BuildContext context) {
-  return Text(context.l10n.common_ok);
+  return Text(context.i18n.common_ok);
 }
 ```
 

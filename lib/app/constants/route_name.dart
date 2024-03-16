@@ -1,5 +1,7 @@
 enum RouteName {
   initial('/'),
+  maintenance('/maintenance'),
+  update('/update'),
   unsupported('/unsupported'),
   login('/login'),
   home('/home'),

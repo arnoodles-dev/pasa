@@ -22,7 +22,7 @@ class PostContainerHeader extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(Insets.xsmall),
             child: Text(
-              context.l10n.post__post_details__author_and_created_date(
+              context.i18n.post__post_details__author_and_created_date(
                 post.author.getOrCrash(),
                 post.createdUtc.ago,
               ),

@@ -62,9 +62,9 @@ class LoginScreen extends HookWidget {
                           children: <Widget>[
                             PasaTextField(
                               controller: emailTextController,
-                              labelText: context.l10n.login__label_text__email,
+                              labelText: context.i18n.login__label_text__email,
                               hintText:
-                                  context.l10n.login__text_field_hint__email,
+                                  context.i18n.login__text_field_hint__email,
                               onChanged: (String value) => context
                                   .read<LoginBloc>()
                                   .onEmailAddressChanged(value),
@@ -74,15 +74,15 @@ class LoginScreen extends HookWidget {
                             PasaTextField(
                               controller: passwordTextController,
                               labelText:
-                                  context.l10n.login__label_text__password,
+                                  context.i18n.login__label_text__password,
                               hintText:
-                                  context.l10n.login__text_field_hint__password,
+                                  context.i18n.login__text_field_hint__password,
                               textInputType: TextInputType.visiblePassword,
                               isPassword: true,
                             ),
                             Gap.xxxlarge(),
                             PasaButton(
-                              text: context.l10n.login__button_text__login,
+                              text: context.i18n.login__button_text__login,
                               isEnabled: !state.isLoading,
                               isExpanded: true,
                               buttonType: ButtonType.filled,

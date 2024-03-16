@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:mobile_service_core/features/analytics/i_analytics_repository.dart';
+import 'package:mobile_service_core/features/crashlytics/i_crashlytics_repository.dart';
 import 'package:pasa/app/helpers/extensions/cubit_ext.dart';
 import 'package:pasa/core/domain/entity/failure.dart';
 import 'package:pasa/core/domain/entity/user.dart';
@@ -18,10 +20,14 @@ class AuthBloc extends Cubit<AuthState> {
   AuthBloc(
     this._userRepository,
     this._authRepository,
+    this._analyticsRepository,
+    this._crashlyticsRepository,
   ) : super(const AuthState.initial());
 
   final IUserRepository _userRepository;
   final IAuthRepository _authRepository;
+  final IAnalyticsRepository _analyticsRepository;
+  final ICrashlyticsRepository _crashlyticsRepository;
 
   Future<void> initialize() async {
     try {
@@ -77,11 +83,17 @@ class AuthBloc extends Cubit<AuthState> {
           safeEmit(const AuthState.unauthenticated());
         }
       },
-      (User user) => safeEmit(
-        AuthState.authenticated(
-          user: user,
-        ),
-      ),
+      (User user) {
+        //TODO: change 'email' to login method used
+        _analyticsRepository.logLogin('email');
+        //TODO: change 'userId' to the actual user id when auth is implemented
+        _crashlyticsRepository.setUserId('userId');
+        safeEmit(
+          AuthState.authenticated(
+            user: user,
+          ),
+        );
+      },
     );
   }
 

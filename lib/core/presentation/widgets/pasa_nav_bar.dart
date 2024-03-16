@@ -32,12 +32,12 @@ class PasaNavBar extends HookWidget implements PreferredSizeWidget {
               NavigationDestination(
                 icon: const Icon(Icons.home_outlined),
                 selectedIcon: const Icon(Icons.home),
-                label: context.l10n.common_home.capitalize(),
+                label: context.i18n.common_home.capitalize(),
               ),
               NavigationDestination(
                 icon: const Icon(Icons.account_circle_outlined),
                 selectedIcon: const Icon(Icons.account_circle),
-                label: context.l10n.common_profile.capitalize(),
+                label: context.i18n.common_profile.capitalize(),
               ),
             ],
             onDestinationSelected: (int index) => _onItemTapped(context, index),

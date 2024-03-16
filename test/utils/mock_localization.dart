@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:pasa/app/generated/l10n.dart';
+import 'package:pasa/app/helpers/app_localization.dart';
 
 class MockLocalization extends StatelessWidget {
   const MockLocalization({required this.child, super.key});
@@ -11,10 +11,10 @@ class MockLocalization extends StatelessWidget {
   Widget build(BuildContext context) => Localizations(
         locale: const Locale('en'),
         delegates: const <LocalizationsDelegate<dynamic>>[
-          AppLocalizations.delegate,
+          AppLocalization.delegate,
           GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
         ],
         child: child,
       );

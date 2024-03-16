@@ -6,7 +6,6 @@ import 'package:flash/flash.dart';
 import 'package:flash/flash_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pasa/app/generated/l10n.dart';
 import 'package:pasa/app/helpers/extensions/build_context_ext.dart';
 import 'package:pasa/app/themes/app_spacing.dart';
 import 'package:pasa/app/themes/app_theme.dart';
@@ -19,7 +18,7 @@ final class DialogUtils {
   static Future<bool> showExitDialog(BuildContext context) async =>
       await DialogUtils.showConfirmationDialog(
         context,
-        message: AppLocalizations.of(context).dialog__message__exit_message,
+        message: context.i18n.dialog__message__exit_message,
         onPositivePressed: () {
           if (Platform.isAndroid) {
             SystemNavigator.pop();

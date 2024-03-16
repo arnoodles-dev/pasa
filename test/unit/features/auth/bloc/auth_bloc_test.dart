@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:mobile_service_core/features/analytics/i_analytics_repository.dart';
+import 'package:mobile_service_core/features/crashlytics/i_crashlytics_repository.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pasa/app/constants/enum.dart';
@@ -17,20 +19,32 @@ import 'auth_bloc_test.mocks.dart';
   MockSpec<IUserRepository>(),
   MockSpec<AuthBloc>(),
   MockSpec<IAuthRepository>(),
+  MockSpec<IAnalyticsRepository>(),
+  MockSpec<ICrashlyticsRepository>(),
 ])
 void main() {
   late MockIUserRepository userRepository;
   late MockIAuthRepository authRepository;
+  late MockIAnalyticsRepository analyticsRepository;
+  late MockICrashlyticsRepository crashlyticsRepository;
   late AuthBloc authBloc;
 
   setUp(() {
     userRepository = MockIUserRepository();
     authRepository = MockIAuthRepository();
-    authBloc = AuthBloc(userRepository, authRepository);
+    analyticsRepository = MockIAnalyticsRepository();
+    crashlyticsRepository = MockICrashlyticsRepository();
+    authBloc = AuthBloc(
+      userRepository,
+      authRepository,
+      analyticsRepository,
+      crashlyticsRepository,
+    );
   });
 
   tearDown(() {
     authBloc.close();
+    reset(analyticsRepository);
     reset(userRepository);
     reset(authRepository);
   });
@@ -86,7 +100,12 @@ void main() {
 
   group('AuthBloc getUser ', () {
     setUp(() async {
-      authBloc = AuthBloc(userRepository, authRepository);
+      authBloc = AuthBloc(
+        userRepository,
+        authRepository,
+        analyticsRepository,
+        crashlyticsRepository,
+      );
       provideDummy(Either<Failure, User>.right(mockUser));
       when(userRepository.user)
           .thenAnswer((_) async => Either<Failure, User>.right(mockUser));
@@ -151,7 +170,12 @@ void main() {
 
   group('AuthBloc logout ', () {
     setUp(() async {
-      authBloc = AuthBloc(userRepository, authRepository);
+      authBloc = AuthBloc(
+        userRepository,
+        authRepository,
+        analyticsRepository,
+        crashlyticsRepository,
+      );
       provideDummy(Either<Failure, User>.right(mockUser));
       when(userRepository.user)
           .thenAnswer((_) async => Either<Failure, User>.right(mockUser));
@@ -215,7 +239,12 @@ void main() {
 
   group('AuthBloc authenticate', () {
     setUp(() async {
-      authBloc = AuthBloc(userRepository, authRepository);
+      authBloc = AuthBloc(
+        userRepository,
+        authRepository,
+        analyticsRepository,
+        crashlyticsRepository,
+      );
       provideDummy(
         Either<Failure, User>.right(mockUser),
       );

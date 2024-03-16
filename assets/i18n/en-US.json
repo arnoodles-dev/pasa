@@ -1,5 +1,4 @@
 {
-  "@@locale": "en",
   "common_error_email_format": "Invalid email format",
   "common_error_empty_string": "{property} is empty",
   "common_error_invalid_password": "Password does not meet the required format",

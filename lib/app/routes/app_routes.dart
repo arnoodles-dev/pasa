@@ -1,13 +1,27 @@
 part of 'app_router.dart';
 
 // ignore_for_file: long-method
-List<RouteBase> _getRoutes(GlobalKey<NavigatorState> rootNavigatorKey) =>
+List<RouteBase> _getRoutes(
+  GlobalKey<NavigatorState> rootNavigatorKey,
+) =>
     <RouteBase>[
       GoRoute(
         path: RouteName.initial.path,
         name: RouteName.initial.name,
         builder: (BuildContext context, GoRouterState state) =>
             const SplashScreen(),
+      ),
+      GoRoute(
+        path: RouteName.update.path,
+        name: RouteName.update.name,
+        builder: (BuildContext context, GoRouterState state) =>
+            const AppUpdateScreen(),
+      ),
+      GoRoute(
+        path: RouteName.maintenance.path,
+        name: RouteName.maintenance.name,
+        builder: (BuildContext context, GoRouterState state) =>
+            const MaintenanceScreen(),
       ),
       GoRoute(
         path: RouteName.login.path,
