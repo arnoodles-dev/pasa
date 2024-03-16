@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pasa/app/generated/app_localization_lookup.generated.dart';
+import 'package:pasa/app/generated/app_localization_lookup.gen.dart';
 
 // ignore_for_file: non_constant_identifier_names
 // ignore_for_file: camel_case_types
