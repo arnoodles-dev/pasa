@@ -32,8 +32,8 @@ pub_outdated: ## Check for outdated packages
 pub_repair: ## Performs a clean reinstallation of all packages in your system cache
 	flutter pub cache repair
 
-l10n: ## Generates strings
-	dart plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_lookup.generated.dart
+i18n: ## Generates strings
+	dart run plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_lookup.generated.dart
 
 build_runner: ## This command generates the files for the code generated dependencies
 	dart run build_runner build --delete-conflicting-outputs
@@ -44,9 +44,9 @@ build_runner_watch: ## This command generates the files for the code generated d
 format: ## This command formats the codebase and run import sorter
 	dart format lib/ test/ plugins/google_mobile_service/lib/ plugins/mobile_service_core/lib/ plugins/i18n_generator/lib/
 
-clean_rebuild: ensure_flutter_version clean pub_clean pub_get l10n build_runner format lint fix_lint
+clean_rebuild: ensure_flutter_version clean pub_clean pub_get i18n build_runner format lint fix_lint
 
-rebuild: pub_get l10n build_runner format lint fix_lint
+rebuild: pub_get i18n build_runner format lint fix_lint
 
 lint: ## Analyzes the codebase for issues
 	flutter analyze lib test
