@@ -20,14 +20,13 @@ pub_clean: ## Empties the entire system cache to reclaim extra disk space or rem
 
 pub_get: ## Gets pubs
 	fvm flutter pub get
-	cd plugins/google_mobile_service && fvm flutter pub get
-	cd plugins/mobile_service_core && fvm flutter pub get
-	cd ../..
+	fvm flutter pub get --directory=plugins/google_mobile_service
+	fvm flutter pub get --directory=plugins/mobile_service_core
 
 pub_outdated: ## Check for outdated packages
 	fvm flutter pub outdated
-	cd plugins/google_mobile_service && fvm flutter pub outdated
-	cd plugins/mobile_service_core && fvm flutter pub outdated
+	fvm flutter pub outdated --directory=plugins/google_mobile_service
+	fvm flutter pub outdated --directory=plugins/mobile_service_core
 
 pub_repair: ## Performs a clean reinstallation of all packages in your system cache
 	fvm flutter pub cache repair

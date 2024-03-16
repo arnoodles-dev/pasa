@@ -28,9 +28,8 @@ jobs:
       - name: 📦 Install Dependencies
         run: |
           flutter pub get
-          cd plugins/google_mobile_service && flutter pub get
-          cd plugins/mobile_service_core && flutter pub get
-          cd ../..
+          flutter pub get --directory=plugins/google_mobile_service
+          flutter pub get --directory=plugins/mobile_service_core
 
       - name: ⚙️ Run Setup
         run: |
