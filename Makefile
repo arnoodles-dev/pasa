@@ -13,68 +13,68 @@ ensure_flutter_version: ## Ensures flutter version is 3.19.3
 ## Note: If you are using a specific flutter version, change '3.19.3' to the desired '{flutter version}' you want to use
 
 clean: ## Delete the build/ and .dart_tool/ directories
-	flutter clean
+	fvm flutter clean
 	
 pub_clean: ## Empties the entire system cache to reclaim extra disk space or remove problematic packages
-	flutter pub cache clean	
+	fvm flutter pub cache clean	
 
 pub_get: ## Gets pubs
-	flutter pub get
-	cd plugins/google_mobile_service && flutter pub get
-	cd plugins/mobile_service_core && flutter pub get
+	fvm flutter pub get
+	cd plugins/google_mobile_service && fvm flutter pub get
+	cd plugins/mobile_service_core && fvm flutter pub get
 	cd ../..
 
 pub_outdated: ## Check for outdated packages
-	flutter pub outdated
-	cd plugins/google_mobile_service && flutter pub outdated
-	cd plugins/mobile_service_core && flutter pub outdated
+	fvm flutter pub outdated
+	cd plugins/google_mobile_service && fvm flutter pub outdated
+	cd plugins/mobile_service_core && fvm flutter pub outdated
 
 pub_repair: ## Performs a clean reinstallation of all packages in your system cache
-	flutter pub cache repair
+	fvm flutter pub cache repair
 
 i18n: ## Generates strings
-	dart run plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_lookup.generated.dart
+	fvm dart run plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_lookup.generated.dart
 
 build_runner: ## This command generates the files for the code generated dependencies
-	dart run build_runner build --delete-conflicting-outputs
+	fvm dart run build_runner build --delete-conflicting-outputs
 
 build_runner_watch: ## This command generates the files for the code generated dependencies 'automatically during development' 
-	dart run build_runner watch --delete-conflicting-outputs
+	fvm dart run build_runner watch --delete-conflicting-outputs
 
 format: ## This command formats the codebase and run import sorter
-	dart format lib/ test/ plugins/google_mobile_service/lib/ plugins/mobile_service_core/lib/ plugins/i18n_generator/lib/
+	fvm dart format lib/ test/ plugins/google_mobile_service/lib/ plugins/mobile_service_core/lib/ plugins/i18n_generator/lib/
 
 clean_rebuild: ensure_flutter_version clean pub_clean pub_get i18n build_runner format lint fix_lint
 
 rebuild: pub_get i18n build_runner format lint fix_lint
 
 lint: ## Analyzes the codebase for issues
-	flutter analyze lib test
-	dart analyze lib test
+	fvm flutter analyze lib test
+	fvm dart analyze lib test
 
 fix_lint: ## Fixes lint issues
-	dart fix --apply
+	fvm dart fix --apply
 
 icons_launcher: ## This command runs icons_launcher
-	dart run icons_launcher:create
+	fvm dart run icons_launcher:create
 
 native_splash: ## This command runs flutter_native_splash
-	dart run flutter_native_splash:create
+	fvm dart run flutter_native_splash:create
 
 dependency_validator: ## This command runs dependency_validator
-	dart run dependency_validator		
+	fvm dart run dependency_validator		
 
 lcov_gen: ## Generates lcov
-	flutter test --coverage
+	fvm flutter test --coverage
 
 lcov_gen_ci: ## Generates lcov in CI environment
-	flutter test --dart-define=CI=true --coverage
+	fvm flutter test --dart-define=CI=true --coverage
 
 lcov_gen_unit: ## Generates lcov for unit tests only
-	flutter test test/unit --coverage 
+	fvm flutter test test/unit --coverage 
 
 lcov_gen_widget: ## Generates lcov for widget tests only
-	flutter test test/widget --coverage 
+	fvm flutter test test/widget --coverage 
 
 lcov_report_mac: ## Generates lcov report for macOS
 	lcov --ignore-errors unused --remove  coverage/lcov.info  'lib/app/*' 'lib/bootstrap.dart' '*.g.dart'  '*.freezed.dart' '*.dto.dart' '*.config.dart' '*.chopper.dart' '*_webview.dart' '**/service/*' '**/entity/*' '**/dto/*' -o coverage/lcov.info
@@ -91,7 +91,7 @@ lcov_win: lcov_gen lcov_report_win ## Generates the lcov report and automaticall
 lcov_mac: lcov_gen lcov_report_mac  ## Generates the lcov report and automatically opens the coverage report for macOS
 
 update_goldens: ## Updates the golden files
-	flutter test --update-goldens
+	fvm flutter test --update-goldens
 
 delete_goldens_win: ## Delete the all golden files in Windows
 	CMD /C FOR /d /r "test/widget" %d IN ("goldens") DO @IF EXIST "%d" rd /s /q "%d"

@@ -30,9 +30,21 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
+    
+      - name: 📦 Install Dependencies
+        run: |
+          flutter pub get
+          cd plugins/google_mobile_service && fvm flutter pub get
+          cd plugins/mobile_service_core && fvm flutter pub get
+          cd ../..
 
-      - name: ⚙️ Build Project
-        run: make rebuild
+      - name: ⚙️ Run Setup
+        run: |
+          dart run plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_lookup.generated.dart
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: ✨ Check Formatting
+        run: dart format lib test
 
       - name: Get last successful commit
         uses: nrwl/last-successful-commit-action@v1

@@ -25,8 +25,25 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
 
-      - name: ⚙️ Build Project
-        run: make rebuild
+      - name: 📦 Install Dependencies
+        run: |
+          flutter pub get
+          cd plugins/google_mobile_service && fvm flutter pub get
+          cd plugins/mobile_service_core && fvm flutter pub get
+          cd ../..
+
+      - name: ⚙️ Run Setup
+        run: |
+          dart run plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_lookup.generated.dart
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: ✨ Check Formatting
+        run: dart format lib test
+
+      - name: 🕵️ Analyze
+        run: |
+          flutter analyze lib test
+          dart analyze lib test
 
       - name: 🧪 Run Tests
         run: flutter test --dart-define=CI=true --coverage
