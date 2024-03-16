@@ -30,7 +30,6 @@ jobs:
           flutter pub get
           cd plugins/google_mobile_service && flutter pub get
           cd plugins/mobile_service_core && flutter pub get
-          cd ../..
 
       - name: ⚙️ Run Setup
         run: |
