@@ -29,10 +29,12 @@ class AuthBloc extends Cubit<AuthState> {
   final IAnalyticsRepository _analyticsRepository;
   final ICrashlyticsRepository _crashlyticsRepository;
 
-  Future<void> initialize() async {
+  Future<void> initialize({bool isOnboardingDone = true}) async {
     try {
       safeEmit(const AuthState.initial());
-      _emitAuthState(await _userRepository.user, isLogout: true);
+      isOnboardingDone
+          ? _emitAuthState(await _userRepository.user, isLogout: true)
+          : safeEmit(const AuthState.unauthenticated());
     } catch (error) {
       _emitError(error);
     }

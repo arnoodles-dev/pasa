@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
@@ -17,9 +18,7 @@ class RemoteConfigBloc extends Cubit<Map<String, dynamic>> {
   RemoteConfigBloc(
     this._remoteConfigRepository,
     this._deviceRepository,
-  ) : super(<String, dynamic>{}) {
-    initialize();
-  }
+  ) : super(<String, dynamic>{});
 
   final IRemoteConfigRepository _remoteConfigRepository;
   final IDeviceRepository _deviceRepository;
@@ -67,6 +66,20 @@ class RemoteConfigBloc extends Cubit<Map<String, dynamic>> {
       return _isForceUpdate(configValue);
     } catch (_) {
       return false;
+    }
+  }
+
+  String? get storeLink {
+    try {
+      if (Platform.isAndroid) {
+        return state['android_storelink'] as String;
+      } else if (Platform.isIOS) {
+        return state['ios_storelink'] as String;
+      } else {
+        return null;
+      }
+    } catch (_) {
+      return null;
     }
   }
 

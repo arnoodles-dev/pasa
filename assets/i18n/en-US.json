@@ -13,6 +13,9 @@
   "common_no": "no",
   "common_profile": "profile",
   "common_yes": "yes",
+  "common_next": "next",
+  "common_skip": "skip",
+  "common_exit": "exit",
   "dialog__message__exit_message": "Are you sure you want to close the application?",
   "login__button_text__login": "login",
   "login__label_text__email": "Email",
@@ -28,5 +31,9 @@
   "profile__label_text__birthday": "Birthday",
   "profile__label_text__email": "Email",
   "profile__label_text__gender": "Gender",
-  "profile__label_text__phone_number": "Phone Number"
+  "profile__label_text__phone_number": "Phone Number",
+  "onboarding__button_text__get_started": "Get Started",
+  "app_update__button_text__update_now": "Update Now",
+  "app_update__label_text__title": "New update is available",
+  "app_update__label_text__subtitle": "To continue using the app, please update to the latest version."
 }

@@ -24,6 +24,12 @@ List<RouteBase> _getRoutes(
             const MaintenanceScreen(),
       ),
       GoRoute(
+        path: RouteName.onboarding.path,
+        name: RouteName.onboarding.name,
+        builder: (BuildContext context, GoRouterState state) =>
+            const OnboardingScreen(),
+      ),
+      GoRoute(
         path: RouteName.login.path,
         name: RouteName.login.name,
         builder: (BuildContext context, GoRouterState state) =>

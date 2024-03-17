@@ -61,9 +61,9 @@ android {
     signingConfigs {
         release {
             storeFile file("key/keystore.jks")
-            storePassword releaseStorePassword
-            keyAlias releaseKeyAlias
-            keyPassword releaseKeyPassword
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storePassword keystoreProperties['storePassword']
             enableV1Signing = true
             enableV2Signing = true
             enableV3Signing = true

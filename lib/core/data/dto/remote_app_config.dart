@@ -8,6 +8,8 @@ class RemoteAppConfig with _$RemoteAppConfig {
   const factory RemoteAppConfig({
     required bool isMaintenance,
     required String minSupportedVersion,
+    required String androidStoreLink,
+    required String iosStoreLink,
     required Map<String, dynamic> en,
   }) = _RemoteAppConfig;
 
@@ -17,6 +19,8 @@ class RemoteAppConfig with _$RemoteAppConfig {
   factory RemoteAppConfig.fallback() => const _RemoteAppConfig(
         isMaintenance: false,
         minSupportedVersion: '1.0.0',
+        androidStoreLink: 'https://play.google.com/',
+        iosStoreLink: 'https://www.apple.com/app-store/',
         en: <String, dynamic>{},
       );
 

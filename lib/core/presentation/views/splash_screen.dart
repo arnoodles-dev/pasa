@@ -7,6 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:pasa/app/helpers/extensions/build_context_ext.dart';
 import 'package:pasa/app/themes/app_spacing.dart';
+import 'package:pasa/core/domain/bloc/app_core/app_core_bloc.dart';
+import 'package:pasa/core/domain/bloc/remote_config/remote_config_bloc.dart';
 import 'package:pasa/core/presentation/widgets/app_title.dart';
 import 'package:pasa/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:safe_device/safe_device.dart';
@@ -14,12 +16,29 @@ import 'package:safe_device/safe_device.dart';
 class SplashScreen extends HookWidget {
   const SplashScreen({super.key});
 
-  void _initialize(BuildContext context) =>
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) async => await _isDeviceSafe() && context.mounted
-            ? await context.read<AuthBloc>().initialize()
-            : await _showUnsupportedDeviceDialog(context),
-      );
+  void _initialize(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) async => await _isDeviceSafe() && context.mounted
+          ? await _initializeBlocs(context)
+          : await _showUnsupportedDeviceDialog(context),
+    );
+  }
+
+  Future<void> _initializeBlocs(BuildContext context) async {
+    final AppCoreBloc appCoreBloc = context.read<AppCoreBloc>();
+    final RemoteConfigBloc remoteConfigBloc = context.read<RemoteConfigBloc>();
+    await Future.wait(<Future<void>>[
+      appCoreBloc.initialize(),
+      remoteConfigBloc.initialize(),
+    ]);
+    if (context.mounted &&
+        !remoteConfigBloc.isForceUpdate &&
+        !remoteConfigBloc.isMaintenance) {
+      await context
+          .read<AuthBloc>()
+          .initialize(isOnboardingDone: appCoreBloc.state.isOnboardingDone);
+    }
+  }
 
   Future<void> _showUnsupportedDeviceDialog(BuildContext context) async {
     await showFlash<void>(

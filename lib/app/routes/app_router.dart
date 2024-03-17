@@ -8,10 +8,12 @@ import 'package:pasa/app/constants/route_name.dart';
 import 'package:pasa/app/helpers/injection.dart';
 import 'package:pasa/app/observers/go_route_observer.dart';
 import 'package:pasa/app/utils/transition_page_utils.dart';
+import 'package:pasa/core/domain/bloc/app_core/app_core_bloc.dart';
 import 'package:pasa/core/domain/bloc/remote_config/remote_config_bloc.dart';
 import 'package:pasa/core/presentation/views/app_update_screen.dart';
 import 'package:pasa/core/presentation/views/main_screen.dart';
 import 'package:pasa/core/presentation/views/maintenance_screen.dart';
+import 'package:pasa/core/presentation/views/onboarding_screen.dart';
 import 'package:pasa/core/presentation/views/splash_screen.dart';
 import 'package:pasa/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:pasa/features/auth/presentation/views/login_screen.dart';
@@ -27,6 +29,7 @@ final class AppRouter {
   AppRouter(
     this._authBloc,
     this._remoteConfigBloc,
+    this._appCoreBloc,
   );
 
   static const String debugLabel = 'root';
@@ -35,6 +38,7 @@ final class AppRouter {
 
   final AuthBloc _authBloc;
   final RemoteConfigBloc _remoteConfigBloc;
+  final AppCoreBloc _appCoreBloc;
 
   late final GoRouter router = GoRouter(
     routes: _getRoutes(rootNavigatorKey),
@@ -54,8 +58,10 @@ final class AppRouter {
     final String homePath = RouteName.home.path;
     final String maintenancePath = RouteName.maintenance.path;
     final String updatePath = RouteName.update.path;
+    final String onboardingPath = RouteName.onboarding.path;
     final bool isMaintenance = _remoteConfigBloc.isMaintenance;
     final bool isForceUpdate = _remoteConfigBloc.isForceUpdate;
+    final bool isOnboardingDone = _appCoreBloc.isOnboardingDone;
 
     if (isMaintenance) {
       return maintenancePath;
@@ -72,7 +78,12 @@ final class AppRouter {
 
     return _authBloc.state.whenOrNull(
       initial: () => initialPath,
-      unauthenticated: () => loginPath,
+      unauthenticated: () {
+        if (!isOnboardingDone) {
+          return onboardingPath;
+        }
+        return loginPath;
+      },
       authenticated: (_) {
         // Check if the app is in the login screen
         final bool isLoginScreen = goRouterState.matchedLocation == loginPath;

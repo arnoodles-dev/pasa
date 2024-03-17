@@ -10,6 +10,7 @@ final class _Keys {
   static const String accessToken = 'access_token';
   static const String refreshToken = 'refresh_token';
   static const String emailAddress = 'email_address';
+  static const String isOnboardingDone = 'is_onboarding_done';
 }
 
 @LazySingleton(as: ILocalStorageRepository)
@@ -66,6 +67,23 @@ class LocalStorageRepository implements ILocalStorageRepository {
     } catch (error) {
       log(error.toString());
 
+      return false;
+    }
+  }
+
+  @override
+  Future<bool?> getIsOnboardingDone() async =>
+      _unsecuredStorage.getBool(_Keys.isOnboardingDone);
+
+  @override
+  Future<bool> setIsOnboardingDone() async {
+    try {
+      return _unsecuredStorage.setBool(
+        _Keys.isOnboardingDone,
+        true,
+      );
+    } catch (error) {
+      log(error.toString());
       return false;
     }
   }

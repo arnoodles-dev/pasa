@@ -20,21 +20,22 @@ class App extends StatelessWidget {
 
   final AppRouter _appRouter = getIt<AppRouter>();
 
-  final List<BlocProvider<dynamic>> _providers = <BlocProvider<dynamic>>[
-    BlocProvider<AuthBloc>(
-      create: (BuildContext context) => getIt<AuthBloc>(),
-    ),
+  final List<BlocProvider<dynamic>> _globalProviders = <BlocProvider<dynamic>>[
     BlocProvider<ThemeBloc>(
       create: (BuildContext context) => getIt<ThemeBloc>(),
+    ),
+    BlocProvider<AppLifeCycleBloc>(
+      create: (BuildContext context) => getIt<AppLifeCycleBloc>(),
     ),
     BlocProvider<HidableBloc>(
       create: (BuildContext context) => getIt<HidableBloc>(),
     ),
+    // Needs Initialization
+    BlocProvider<AuthBloc>(
+      create: (BuildContext context) => getIt<AuthBloc>(),
+    ),
     BlocProvider<AppCoreBloc>(
       create: (BuildContext context) => getIt<AppCoreBloc>(),
-    ),
-    BlocProvider<AppLifeCycleBloc>(
-      create: (BuildContext context) => getIt<AppLifeCycleBloc>(),
     ),
     BlocProvider<RemoteConfigBloc>(
       create: (BuildContext context) => getIt<RemoteConfigBloc>(),
@@ -80,7 +81,7 @@ class App extends StatelessWidget {
     /// This will tell you which image is oversized by throwing an exception.
     debugInvertOversizedImages = true;
     return MultiBlocProvider(
-      providers: _providers,
+      providers: _globalProviders,
       child: Builder(
         builder: (BuildContext context) => MaterialApp.router(
           routerConfig: _appRouter.router,
