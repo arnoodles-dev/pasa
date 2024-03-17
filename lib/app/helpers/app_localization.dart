@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pasa/app/generated/app_localization_lookup.gen.dart';
+import 'package:pasa/app/generated/app_localization_mixin.gen.dart';
 
 // ignore_for_file: non_constant_identifier_names
 // ignore_for_file: camel_case_types
@@ -12,7 +12,7 @@ import 'package:pasa/app/generated/app_localization_lookup.gen.dart';
 typedef LocaleChangeCallback = void Function(Locale locale);
 
 class AppLocalization
-    with AppLocalizationLookup
+    with AppLocalizationMixin
     implements WidgetsLocalizations {
   factory AppLocalization() => _instance;
 

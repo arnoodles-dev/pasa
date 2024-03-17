@@ -39,7 +39,7 @@ jobs:
 
       - name: ⚙️ Run Setup
         run: |
-          dart run plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_lookup.generated.dart
+          dart run plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_mixin.gen.dart
           dart run build_runner build --delete-conflicting-outputs
 
       - name: ✨ Check Formatting

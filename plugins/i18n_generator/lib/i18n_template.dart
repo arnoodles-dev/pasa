@@ -23,7 +23,7 @@ class I18nTemplate {
 // ignore_for_file: inference_failure_on_untyped_parameter
 ''';
 
-  String get classDeclare => 'mixin AppLocalizationLookup {\n';
+  String get classDeclare => 'mixin AppLocalizationMixin {\n';
   String get classDeclareFunctions => '''
 
   Map<String, dynamic> _content = <String, dynamic>{};

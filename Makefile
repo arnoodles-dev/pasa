@@ -32,7 +32,7 @@ pub_repair: ## Performs a clean reinstallation of all packages in your system ca
 	fvm flutter pub cache repair
 
 i18n: ## Generates strings
-	fvm dart run plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_lookup.generated.dart
+	fvm dart run plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_mixin.gen.dart
 
 build_runner: ## This command generates the files for the code generated dependencies
 	fvm dart run build_runner build --delete-conflicting-outputs
