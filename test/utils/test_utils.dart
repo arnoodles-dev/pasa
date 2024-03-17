@@ -4,7 +4,9 @@ import 'package:chopper/chopper.dart' as chopper;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pasa/app/config/chopper_config.dart';
+import 'package:pasa/app/constants/constant.dart';
 import 'package:pasa/app/constants/enum.dart';
 import 'package:pasa/app/helpers/injection.dart';
 import 'package:pasa/bootstrap.dart';
@@ -25,10 +27,21 @@ Future<void> setupInjection() async {
   PathProviderPlatform.instance = MockPathProviderPlatform();
   SharedPreferences.setMockInitialValues(<String, Object>{});
   initializeSingletons();
+  _mockPackageInfo();
   await Future.wait(<Future<void>>[
     initializeEnvironmentConfig(Env.test),
     configureDependencies(Env.test),
   ]);
+}
+
+void _mockPackageInfo() {
+  PackageInfo.setMockInitialValues(
+    appName: Constant.appName,
+    packageName: 'com.example.example',
+    version: '1.0',
+    buildNumber: '1',
+    buildSignature: 'buildSignature',
+  );
 }
 
 User get mockUser => UserDTO(
