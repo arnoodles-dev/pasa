@@ -1,12 +1,10 @@
 import 'dart:convert';
 
 import 'package:dartx/dartx.dart';
-import 'package:faker/faker.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:pasa/app/constants/enum.dart';
-import 'package:pasa/app/helpers/converters/string_to_datetime.dart';
 import 'package:pasa/core/domain/entity/user.dart';
 import 'package:pasa/core/domain/entity/value_object.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 part 'user.dto.freezed.dart';
 part 'user.dto.g.dart';
@@ -14,14 +12,12 @@ part 'user.dto.g.dart';
 @freezed
 class UserDTO with _$UserDTO {
   const factory UserDTO({
-    @JsonKey(name: 'id') required int uid,
-    required String email,
-    @JsonKey(name: 'first_name') required String firstName,
-    @JsonKey(name: 'last_name') required String lastName,
-    String? avatar,
-    String? gender,
-    String? contactNumber,
-    @StringToDateTime() DateTime? birthday,
+    @JsonKey(name: 'id') required String uid,
+    required String createdAt,
+    String? lastSignInAt,
+    String? updatedAt,
+    String? email,
+    String? phoneNumber,
   }) = _UserDTO;
 
   const UserDTO._();
@@ -29,15 +25,22 @@ class UserDTO with _$UserDTO {
   factory UserDTO.fromJson(Map<String, dynamic> json) =>
       _$UserDTOFromJson(json);
 
+  factory UserDTO.fromSupabase(supabase.User user) => UserDTO(
+        uid: user.id,
+        email: user.email,
+        phoneNumber: user.phone,
+        lastSignInAt: user.lastSignInAt,
+        updatedAt: user.updatedAt,
+        createdAt: user.createdAt,
+      );
+
   factory UserDTO.fromDomain(User user) => UserDTO(
-        uid: int.parse(user.uid.getOrCrash()),
-        email: user.email.getOrCrash(),
-        firstName: user.firstName.getOrCrash(),
-        lastName: user.lastName.getOrCrash(),
-        avatar: user.avatar?.getOrCrash(),
-        gender: user.gender.name,
-        contactNumber: user.contactNumber.getOrCrash(),
-        birthday: user.birthday,
+        uid: user.uid.getOrCrash(),
+        email: user.email?.getOrCrash(),
+        phoneNumber: user.phoneNumber?.getOrCrash(),
+        lastSignInAt: user.lastSignInAt?.toIso8601String(),
+        updatedAt: user.updatedAt?.toIso8601String(),
+        createdAt: user.createdAt.toIso8601String(),
       );
 
   factory UserDTO.userDTOFromJson(String str) =>
@@ -45,30 +48,16 @@ class UserDTO with _$UserDTO {
 
   static String userDTOToJson(UserDTO data) => json.encode(data.toJson());
 
-  User toDomain() {
-    final Faker faker = Faker();
-    final int currentYear = DateTime.now().year;
-    const int minYear = 100;
-    const int maxYear = 18;
-
-    return User(
-      uid: UniqueId.fromUniqueString(uid.toString()),
-      firstName: ValueName(firstName),
-      lastName: ValueName(lastName),
-      email: EmailAddress(email),
-      gender: Gender.values.firstWhere(
-        (Gender element) => element.name == gender?.toLowerCase(),
-        orElse: () => Gender.unknown,
-      ),
-      birthday: birthday ??
-          faker.date.dateTime(
-            minYear: currentYear - minYear,
-            maxYear: currentYear - maxYear,
-          ),
-      contactNumber: contactNumber.isNotNullOrBlank
-          ? ContactNumber(contactNumber!)
-          : ContactNumber(faker.phoneNumber.us()),
-      avatar: (avatar?.isNotNullOrBlank ?? false) ? Url(avatar!) : null,
-    );
-  }
+  User toDomain() => User(
+        uid: UniqueId.fromUniqueString(uid),
+        email: email.isNotNullOrBlank ? EmailAddress(email!) : null,
+        phoneNumber:
+            phoneNumber.isNotNullOrBlank ? PhoneNumber(phoneNumber!) : null,
+        lastSignInAt: lastSignInAt.isNotNullOrBlank
+            ? DateTime.tryParse(lastSignInAt!)
+            : null,
+        updatedAt:
+            updatedAt.isNotNullOrBlank ? DateTime.tryParse(updatedAt!) : null,
+        createdAt: DateTime.parse(createdAt),
+      );
 }

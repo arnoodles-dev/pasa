@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flash/flash.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +66,8 @@ class SplashScreen extends HookWidget {
     if (kDebugMode) {
       return true;
     } else {
-      final bool isDevice = Platform.isIOS || Platform.isAndroid;
+      final bool isDevice = defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.android;
       if (isDevice) {
         final List<bool> results = await Future.wait(<Future<bool>>[
           SafeDevice.isRealDevice,

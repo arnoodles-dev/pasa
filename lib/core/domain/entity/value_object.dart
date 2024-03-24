@@ -123,9 +123,9 @@ class AuthToken extends ValueObject<String> {
   final Either<Failure, String> value;
 }
 
-class ContactNumber extends ValueObject<String> {
-  factory ContactNumber(String input) => ContactNumber._(
-        validateStringEmpty(input, 'ContactNumber') // should not be empty
+class PhoneNumber extends ValueObject<String> {
+  factory PhoneNumber(String input) => PhoneNumber._(
+        validateStringEmpty(input, 'PhoneNumber') // should not be empty
             .andThen(
           () => validateCharacterLength(
             input,
@@ -134,7 +134,7 @@ class ContactNumber extends ValueObject<String> {
           ),
         ), // should be between 3 and 50
       );
-  const ContactNumber._(this.value);
+  const PhoneNumber._(this.value);
   @override
   final Either<Failure, String> value;
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:mobile_service_core/features/remote_config/i_remote_config_repository.dart';
 
@@ -7,7 +9,7 @@ class GMSRemoteConfigRepository implements IRemoteConfigRepository {
   final FirebaseRemoteConfig _remoteConfig;
 
   @override
-  Future<void> initializeRemoteConfig(
+  Future<StreamSubscription<dynamic>> initializeRemoteConfig(
     void Function(RemoteConfigUpdate)? onData,
   ) async {
     await _remoteConfig.setConfigSettings(
@@ -16,7 +18,7 @@ class GMSRemoteConfigRepository implements IRemoteConfigRepository {
         minimumFetchInterval: const Duration(seconds: 10),
       ),
     );
-    _remoteConfig.onConfigUpdated.listen(onData);
+    return _remoteConfig.onConfigUpdated.listen(onData);
   }
 
   @override

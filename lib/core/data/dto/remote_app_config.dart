@@ -6,10 +6,10 @@ part 'remote_app_config.g.dart';
 @freezed
 class RemoteAppConfig with _$RemoteAppConfig {
   const factory RemoteAppConfig({
-    required bool isMaintenance,
-    required String minSupportedVersion,
-    required String androidStoreLink,
-    required String iosStoreLink,
+    @JsonKey(name: 'is_maintenance') required bool isMaintenance,
+    @JsonKey(name: 'min_supported_version') required String minSupportedVersion,
+    @JsonKey(name: 'android_store_link') required String androidStoreLink,
+    @JsonKey(name: 'ios_store_link') required String iosStoreLink,
     required Map<String, dynamic> en,
   }) = _RemoteAppConfig;
 

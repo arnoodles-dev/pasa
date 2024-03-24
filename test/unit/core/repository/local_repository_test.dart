@@ -46,7 +46,7 @@ void main() {
         },
       );
       test(
-        'should return true if the access token is saved successfully',
+        'should be called once if the access token is saved successfully',
         () async {
           when(
             secureStorage.write(
@@ -55,14 +55,14 @@ void main() {
             ),
           ).thenAnswer((_) async => true);
 
-          final bool result =
-              await localStorageRepository.setAccessToken('access_token');
+          await localStorageRepository.setAccessToken('access_token');
 
-          expect(result, true);
+          verify(localStorageRepository.setAccessToken('access_token'))
+              .called(1);
         },
       );
       test(
-        'should return false if an unexpected error occurs when saving',
+        'should throw an exception if an unexpected error occurs when saving',
         () async {
           when(
             secureStorage.write(
@@ -71,99 +71,97 @@ void main() {
             ),
           ).thenThrow(throwsException);
 
-          final bool result =
-              await localStorageRepository.setAccessToken('access_token');
-
-          expect(result, false);
+          expect(
+            () => localStorageRepository.setAccessToken('access_token'),
+            throwsA(isA<Exception>()),
+          );
         },
       );
     });
 
-    group('refresh token', () {
+    group('id token', () {
       test(
-        'should return the refresh token',
+        'should return the id token',
         () async {
-          const String matcher = 'refreshToken';
-          when(secureStorage.read(key: 'refresh_token'))
+          const String matcher = 'idToken';
+          when(secureStorage.read(key: 'id_token'))
               .thenAnswer((_) async => matcher);
 
-          final String? refreshToken =
-              await localStorageRepository.getRefreshToken();
+          final String? idToken = await localStorageRepository.getIdToken();
 
-          expect(refreshToken, matcher);
+          expect(idToken, matcher);
         },
       );
       test(
-        'should return true if the refresh token is saved',
+        'should be called once if the id token is saved',
         () async {
           when(
             secureStorage.write(
-              key: 'refresh_token',
+              key: 'id_token',
               value: anyNamed('value'),
             ),
           ).thenAnswer((_) async => true);
 
-          final bool result =
-              await localStorageRepository.setRefreshToken('refresh_token');
+          await localStorageRepository.setIdToken('id_token');
 
-          expect(result, true);
+          verify(localStorageRepository.setIdToken('id_token')).called(1);
         },
       );
       test(
-        'should return false if an unexpected error occurs when saving',
+        'should throw an exception if an unexpected error occurs when saving',
         () async {
           when(
             secureStorage.write(
-              key: 'refresh_token',
+              key: 'id_token',
               value: anyNamed('value'),
             ),
           ).thenThrow(throwsException);
 
-          final bool result =
-              await localStorageRepository.setRefreshToken('refresh_token');
-
-          expect(result, false);
+          expect(
+            () => localStorageRepository.setIdToken('id_token'),
+            throwsA(isA<Exception>()),
+          );
         },
       );
     });
   });
 
   group('Unsecure Storage', () {
-    group('last logged in email', () {
+    group('is onboarding done', () {
       test(
-        'should return the last logged in email',
+        'should return the is_onboarding_done flag',
         () async {
-          const String matcher = 'email@example.com';
-          when(unsecuredStorage.getString('email_address')).thenReturn(matcher);
+          when(unsecuredStorage.getBool('is_onboarding_done')).thenReturn(true);
 
-          final String? lastLoggedInEmail =
-              await localStorageRepository.getLastLoggedInEmail();
+          final bool? isOnboardingDone =
+              await localStorageRepository.getIsOnboardingDone();
 
-          expect(lastLoggedInEmail, matcher);
+          expect(isOnboardingDone, true);
         },
       );
       test(
-        'should return true if the refresh token is saved',
+        'should be called once if is_onboarding_done flag is saved',
         () async {
-          when(unsecuredStorage.setString('email_address', any))
-              .thenAnswer((_) async => true);
+          when(
+            unsecuredStorage.setBool('is_onboarding_done', any),
+          ).thenAnswer((_) async => true);
 
-          final bool result = await localStorageRepository
-              .setLastLoggedInEmail('email@example.com');
+          await localStorageRepository.setIsOnboardingDone();
 
-          expect(result, true);
+          verify(localStorageRepository.setIsOnboardingDone()).called(1);
         },
       );
+
       test(
         'should return false if an unexpected error occurs when saving',
         () async {
-          when(unsecuredStorage.setString('email_address', any))
+          when(unsecuredStorage.setBool('is_onboarding_done', any))
               .thenThrow(throwsException);
 
-          final bool result = await localStorageRepository
-              .setLastLoggedInEmail('email@example.com');
-
-          expect(result, false);
+          expect(
+            () => localStorageRepository.setIsOnboardingDone(),
+            throwsA(isA<Exception>()),
+          );
         },
       );
     });

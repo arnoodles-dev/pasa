@@ -5,12 +5,12 @@ LCOV=C:\ProgramData\chocolatey\lib\lcov\tools\bin\lcov
 
 ## Note: In windows, recommended terminal is cmd 
 
-ensure_flutter_version: ## Ensures flutter version is 3.19.3 
-	fvm install 3.19.3
-	fvm use 3.19.3
-	fvm global 3.19.3
+ensure_flutter_version: ## Ensures flutter version is 3.19.4 
+	fvm install 3.19.4
+	fvm use 3.19.4
+	fvm global 3.19.4
 
-## Note: If you are using a specific flutter version, change '3.19.3' to the desired '{flutter version}' you want to use
+## Note: If you are using a specific flutter version, change '3.19.4' to the desired '{flutter version}' you want to use
 
 clean: ## Delete the build/ and .dart_tool/ directories
 	fvm flutter clean
@@ -81,9 +81,9 @@ lcov_report_mac: ## Generates lcov report for macOS
 	open coverage/index.html		
 
 lcov_report_win:  ## Generates lcov report for Windows
-	perl ${LCOV} lcov --ignore-errors unused --remove  coverage/lcov.info  'lib/app/*' 'lib/bootstrap.dart' '*.g.dart'  '*.freezed.dart' '*.dto.dart' '*.config.dart' '*.chopper.dart' '*_webview.dart' '**/service/*' '**/dto/*' '**/entity/*' -o coverage/lcov.info
-	perl ${GENHTML} -o coverage/html coverage/lcov.info
-	CMD /C start coverage/html/index.html	
+	perl ${LCOV} lcov --ignore-errors unused --remove  coverage/lcov.info  'lib/app/*' 'lib/bootstrap.dart' '*.g.dart'  '*.freezed.dart' '*.dto.dart' '*.config.dart' '*.chopper.dart' '*_screen.dart' '*_webview.dart' '**/service/*' '**/dto/*' '**/entity/*' -o coverage/lcov.info
+	perl ${GENHTML} -o coverage coverage/lcov.info
+	CMD /C start coverage/index.html	
 
 lcov_win: lcov_gen lcov_report_win ## Generates the lcov report and automatically opens the coverage report for Windows
 

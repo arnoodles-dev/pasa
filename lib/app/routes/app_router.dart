@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pasa/app/constants/enum.dart';
-import 'package:pasa/app/constants/route_name.dart';
 import 'package:pasa/app/helpers/injection.dart';
 import 'package:pasa/app/observers/go_route_observer.dart';
+import 'package:pasa/app/routes/route_name.dart';
 import 'package:pasa/app/utils/transition_page_utils.dart';
 import 'package:pasa/core/domain/bloc/app_core/app_core_bloc.dart';
 import 'package:pasa/core/domain/bloc/remote_config/remote_config_bloc.dart';
@@ -15,12 +15,15 @@ import 'package:pasa/core/presentation/views/main_screen.dart';
 import 'package:pasa/core/presentation/views/maintenance_screen.dart';
 import 'package:pasa/core/presentation/views/onboarding_screen.dart';
 import 'package:pasa/core/presentation/views/splash_screen.dart';
+import 'package:pasa/features/account/presentation/views/account_screen.dart';
+import 'package:pasa/features/activity/presentation/views/activity_screen.dart';
 import 'package:pasa/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:pasa/features/auth/presentation/views/login_screen.dart';
 import 'package:pasa/features/home/domain/entity/post.dart';
 import 'package:pasa/features/home/presentation/views/home_screen.dart';
 import 'package:pasa/features/home/presentation/views/post_details_webview.dart';
-import 'package:pasa/features/profile/presentation/views/profile_screen.dart';
+import 'package:pasa/features/message/presentation/views/message_screen.dart';
+import 'package:pasa/features/post/presentation/views/create_post_screen.dart';
 
 part 'app_routes.dart';
 

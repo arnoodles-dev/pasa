@@ -1,5 +1,7 @@
+import 'dart:async';
+
 abstract class IRemoteConfigRepository {
-  Future<void> initializeRemoteConfig(
+  Future<StreamSubscription<dynamic>> initializeRemoteConfig(
     void Function(dynamic)? onData,
   );
   Future<Map<String, String>> fetchRemoteConfig();

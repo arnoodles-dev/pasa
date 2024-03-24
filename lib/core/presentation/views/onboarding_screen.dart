@@ -6,9 +6,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pasa/app/constants/enum.dart';
-import 'package:pasa/app/constants/route_name.dart';
 import 'package:pasa/app/generated/assets.gen.dart';
 import 'package:pasa/app/helpers/extensions/build_context_ext.dart';
+import 'package:pasa/app/routes/route_name.dart';
+import 'package:pasa/app/themes/app_sizes.dart';
 import 'package:pasa/app/themes/app_spacing.dart';
 import 'package:pasa/core/domain/bloc/app_core/app_core_bloc.dart';
 import 'package:pasa/core/presentation/widgets/pasa_button.dart';
@@ -18,6 +19,23 @@ class OnboardingScreen extends HookWidget {
   const OnboardingScreen({super.key});
 
   static const int totalPages = 3;
+  static final Faker faker = Faker();
+
+  //TODO: delete this once  onboarding title/subtitle is finalize
+  static final String title1 = faker.lorem.words(3).join(' ');
+  static final String title2 = faker.lorem.words(3).join(' ');
+  static final String title3 = faker.lorem.words(3).join(' ');
+  static final String body1 = faker.lorem.sentences(2).join(' ');
+  static final String body2 = faker.lorem.sentences(2).join(' ');
+  static final String body3 = faker.lorem.sentences(2).join(' ');
+
+  String _getTitle(int index) =>
+      switch (index) { 0 => title1, 1 => title2, 2 => title3, _ => '' };
+
+  String _getBody(int index) =>
+      switch (index) { 0 => body1, 1 => body2, 2 => body3, _ => '' };
+
+  //TODO: finalize onboarding page images
   String _getImagePath(int index) => switch (index) {
         0 => Assets.images.onboardingTravel,
         1 => Assets.images.onboardingDeliver,
@@ -49,35 +67,36 @@ class OnboardingScreen extends HookWidget {
   Widget build(BuildContext context) {
     final PageController pageController = usePageController();
     final ValueNotifier<int> index = useState<int>(0);
-    const double indicatorSize = 10;
+    const double indicatorSize = AppSizes.size8;
 
     return Scaffold(
+      backgroundColor: context.colorScheme.background,
       body: Column(
         children: <Widget>[
           Expanded(
             child: PageView.builder(
               itemCount: totalPages,
               controller: pageController,
-              itemBuilder: (BuildContext context, int index) =>
-                  _OnBoardingContent(
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) => _OnBoardingPage(
                 imagePath: _getImagePath(index),
-                title: Faker().lorem.words(3).join(' '),
-                body: Faker().lorem.sentences(2).join(' '),
+                title: _getTitle(index),
+                body: _getBody(index),
               ),
               onPageChanged: (int value) => index.value = value,
             ),
           ),
+          Gap.large(),
           SmoothPageIndicator(
             controller: pageController,
             count: totalPages,
-            onDotClicked: (int index) => _onNext(pageController, index),
             effect: ExpandingDotsEffect(
               dotWidth: indicatorSize,
               dotHeight: indicatorSize,
               activeDotColor: context.colorScheme.primary,
             ),
           ),
-          Gap.xlarge(),
+          Gap.large(),
           _OnBoardingFooter(
             index: index,
             onDone: () => _onDone(context),
@@ -124,19 +143,21 @@ class _OnBoardingFooter extends StatelessWidget {
           if (!isLastPage) ...<Widget>[
             PasaButton(
               text: context.i18n.common_skip.capitalize(),
+              isExpanded: true,
               buttonType: ButtonType.text,
               onPressed: onSkip,
+              contentPadding: const EdgeInsets.all(Insets.xsmall),
+              padding: EdgeInsets.zero,
             ),
           ],
-          Gap.large(),
         ],
       ),
     );
   }
 }
 
-class _OnBoardingContent extends StatelessWidget {
-  const _OnBoardingContent({
+class _OnBoardingPage extends StatelessWidget {
+  const _OnBoardingPage({
     required this.imagePath,
     required this.title,
     required this.body,
@@ -148,24 +169,25 @@ class _OnBoardingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double widthFactor = 0.8; // 80% of screen width
+    const double widthFactor = 0.8; // 90% of screen width
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Insets.large),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          const Spacer(),
-          SvgPicture.asset(
-            imagePath,
-            width: context.screenWidth * widthFactor,
-            height: context.screenWidth * widthFactor,
+          SizedBox.square(
+            dimension: context.screenWidth * widthFactor,
+            child: SvgPicture.asset(
+              imagePath,
+              alignment: Alignment.bottomCenter,
+            ),
           ),
-          const Spacer(),
+          Gap.xxxlarge(),
           FractionallySizedBox(
             widthFactor: widthFactor,
             child: Text(
               title,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: context.textTheme.displaySmall?.copyWith(
@@ -178,13 +200,14 @@ class _OnBoardingContent extends StatelessWidget {
             widthFactor: widthFactor,
             child: Text(
               body,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: context.textTheme.titleMedium?.copyWith(
                 color: context.colorScheme.secondary,
               ),
             ),
           ),
-          Gap.xxlarge(),
         ],
       ),
     );

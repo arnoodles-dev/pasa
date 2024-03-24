@@ -54,5 +54,18 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>com.googleusercontent.apps.75714035386-gg6jbnijsrgmas4ja1k8mehcv2pofepr</string> <!--Auth Client ID For PROD -->
+					<string>com.googleusercontent.apps.75714035386-mg1psms4oqs4da7813vhr1pdo30din3p</string> <!--Auth Client ID For STG -->
+					<string>com.googleusercontent.apps.75714035386-ic55dt6nekp3tbkl0bolkh02a1chohjc</string> <!--Auth Client ID For Dev -->
+				</array>
+			</dict>
+		</array>
 	</dict>
 </plist>

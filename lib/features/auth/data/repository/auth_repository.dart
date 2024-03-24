@@ -1,91 +1,126 @@
-import 'dart:developer';
+import 'dart:async';
 
-import 'package:chopper/chopper.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
+import 'package:logger/logger.dart';
 import 'package:pasa/app/constants/enum.dart';
 import 'package:pasa/app/helpers/extensions/int_ext.dart';
-import 'package:pasa/app/helpers/extensions/status_code_ext.dart';
+import 'package:pasa/app/helpers/injection.dart';
 import 'package:pasa/core/domain/entity/failure.dart';
-import 'package:pasa/core/domain/entity/value_object.dart';
 import 'package:pasa/core/domain/interface/i_local_storage_repository.dart';
-import 'package:pasa/features/auth/data/dto/login_response.dto.dart';
-import 'package:pasa/features/auth/data/service/auth_service.dart';
 import 'package:pasa/features/auth/domain/interface/i_auth_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 @LazySingleton(as: IAuthRepository)
 class AuthRepository implements IAuthRepository {
-  AuthRepository(
-    this._authService,
+  const AuthRepository(
+    this._supabase,
     this._localStorageRepository,
+    this._googleSignIn,
   );
 
+  final SupabaseClient _supabase;
+  final GoogleSignIn _googleSignIn;
   final ILocalStorageRepository _localStorageRepository;
 
-  final AuthService _authService;
+  Logger get logger => getIt<Logger>();
 
   @override
-  Future<Either<Failure, Unit>> login(
-    EmailAddress email,
-    Password password,
+  StreamSubscription<AuthState> onAuthStateChange(
+    void Function(AuthState)? onData,
+  ) =>
+      _supabase.auth.onAuthStateChange.listen(onData);
+
+  @override
+  Future<Either<Failure, AuthResponse>> loginWithProvider(
+    OAuthProvider provider,
   ) async {
     try {
-      final String emailAddress = email.getOrCrash();
-      final Map<String, dynamic> requestBody = <String, dynamic>{
-        'email': emailAddress,
-        'password': password.getOrCrash(),
+      final (String idToken, String accessToken) = switch (provider) {
+        OAuthProvider.google => await _signInWithGoogle(),
+        _ => ('', '')
       };
+      final AuthResponse reponse = await _supabase.auth.signInWithIdToken(
+        provider: provider,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
 
-      final Response<LoginResponseDTO> response =
-          await _authService.login(requestBody);
-      final StatusCode statusCode = response.statusCode.statusCode;
-
-      if (statusCode.isSuccess && response.body != null) {
-        // Save tokens to local storage
-        final List<bool> results = await Future.wait(<Future<bool>>[
-          _localStorageRepository.setAccessToken(response.body!.accessToken),
-          _localStorageRepository.setRefreshToken(response.body!.refreshToken),
-          _localStorageRepository.setLastLoggedInEmail(emailAddress),
-        ]);
-
-        if (results.contains(false)) {
-          return left(const Failure.storageError());
-        }
-
-        return right(unit);
-      } else {
-        return left(
-          Failure.serverError(statusCode, response.error?.toString() ?? ''),
-        );
-      }
+      return right(reponse);
+    } on AuthException catch (error) {
+      return left(_onAuthError(error));
     } catch (error) {
-      log(error.toString());
-
+      logger.e(error.toString());
       return left(Failure.unexpected(error.toString()));
     }
   }
+  //TODO: implement this when sms provider is available
+  // @override
+  // Future<Either<Failure, Unit>> loginWithPhoneNumber(
+  //   PhoneNumber phone,
+  // ) async {
+  //   try {
+  //     await _supabase.auth.signInWithOtp(phone: phone.getOrCrash());
+  //     return right(unit);
+  //   } on AuthException catch (error) {
+  //     return left(_onAuthError(error));
+  //   } catch (error) {
+  //     logger.e(error.toString());
+  //     return left(Failure.unexpected(error.toString()));
+  //   }
+  // }
 
   @override
   Future<Either<Failure, Unit>> logout() async {
     try {
-      //TODO: add  service to logout
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-
-      //clear auth tokens from the local storage
-      final List<bool> results = await Future.wait(<Future<bool>>[
-        _localStorageRepository.setAccessToken(null),
-        _localStorageRepository.setRefreshToken(null),
+      await Future.wait(<Future<void>>[
+        _saveTokens(null, null),
+        _supabase.auth.signOut(),
       ]);
-
-      if (results.contains(false)) {
-        return left(const Failure.storageError());
-      }
-
       return right(unit);
+    } on AuthException catch (error) {
+      return left(_onAuthError(error));
     } catch (error) {
-      log(error.toString());
-
+      logger.e(error.toString());
       return left(Failure.unexpected(error.toString()));
     }
   }
+
+  Failure _onAuthError(AuthException error) {
+    logger.e(error.toString());
+    final int? code = int.tryParse(error.statusCode ?? '');
+    final StatusCode statusCode =
+        code != null ? code.statusCode : StatusCode.http000;
+    return Failure.serverError(statusCode, error.message);
+  }
+
+  Future<(String, String)> _signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser != null) {
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final String? accessToken = googleAuth.accessToken;
+      final String? idToken = googleAuth.idToken;
+
+      if (accessToken == null) {
+        throw Exception('No Access Token found.');
+      }
+      if (idToken == null) {
+        throw Exception('No ID Token found.');
+      }
+      // if true then an error occured while saving
+      await _saveTokens(accessToken, idToken);
+
+      return (idToken, accessToken);
+    } else {
+      throw Exception('User not found');
+    }
+  }
+
+  Future<void> _saveTokens(String? accessToken, String? idToken) =>
+      Future.wait(<Future<void>>[
+        _localStorageRepository.setAccessToken(accessToken),
+        _localStorageRepository.setIdToken(idToken),
+      ]);
 }

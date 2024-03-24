@@ -1,99 +1,43 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:mobile_service_core/features/analytics/i_analytics_repository.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pasa/app/constants/enum.dart';
 import 'package:pasa/core/domain/entity/failure.dart';
-import 'package:pasa/core/domain/interface/i_local_storage_repository.dart';
 import 'package:pasa/features/auth/domain/bloc/login/login_bloc.dart';
 import 'package:pasa/features/auth/domain/interface/i_auth_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'login_bloc_test.mocks.dart';
 
 @GenerateNiceMocks(
   <MockSpec<dynamic>>[
     MockSpec<IAuthRepository>(),
-    MockSpec<ILocalStorageRepository>(),
+    MockSpec<IAnalyticsRepository>(),
   ],
 )
 void main() {
   late MockIAuthRepository authRepository;
-  late MockILocalStorageRepository localStorageRepository;
+  late MockIAnalyticsRepository analyticsRepository;
   late LoginBloc loginBloc;
-  late String email;
-  late String password;
+
   late Failure failure;
 
   setUp(() {
     authRepository = MockIAuthRepository();
-    localStorageRepository = MockILocalStorageRepository();
-    email = 'email@example.com';
-    password = 'password';
+    analyticsRepository = MockIAnalyticsRepository();
   });
 
   tearDown(() {
-    reset(localStorageRepository);
+    reset(analyticsRepository);
     reset(authRepository);
   });
 
-  group('LoginBloc initialize', () {
-    blocTest<LoginBloc, LoginState>(
-      'should emit an null email address',
-      build: () {
-        when(localStorageRepository.getLastLoggedInEmail())
-            .thenAnswer((_) async => null);
-
-        return LoginBloc(authRepository, localStorageRepository);
-      },
-      act: (LoginBloc bloc) => bloc.initialize(),
-      expect: () => <dynamic>[
-        LoginState.initial().copyWith(isLoading: false),
-      ],
-    );
-
-    blocTest<LoginBloc, LoginState>(
-      'should emit an email address',
-      build: () {
-        when(localStorageRepository.getLastLoggedInEmail())
-            .thenAnswer((_) async => email);
-
-        return LoginBloc(authRepository, localStorageRepository);
-      },
-      act: (LoginBloc bloc) => bloc.initialize(),
-      expect: () => <dynamic>[
-        LoginState.initial().copyWith(
-          isLoading: false,
-          emailAddress: email,
-        ),
-      ],
-    );
-  });
-
-  group('LoginBloc onEmailAddressChanged', () {
+  group('LoginBloc loginWithProvider', () {
     setUp(() {
-      when(localStorageRepository.getLastLoggedInEmail())
-          .thenAnswer((_) async => null);
-      loginBloc = LoginBloc(authRepository, localStorageRepository);
-    });
-    blocTest<LoginBloc, LoginState>(
-      'should emit an the new email address',
-      build: () => loginBloc,
-      act: (LoginBloc bloc) async => bloc.onEmailAddressChanged('test_$email'),
-      expect: () => <dynamic>[
-        LoginState.initial().copyWith(
-          isLoading: false,
-          emailAddress: 'test_$email',
-        ),
-      ],
-    );
-  });
-
-  group('LoginBloc login', () {
-    setUp(() {
-      when(localStorageRepository.getLastLoggedInEmail())
-          .thenAnswer((_) async => null);
-      loginBloc = LoginBloc(authRepository, localStorageRepository);
+      loginBloc = LoginBloc(authRepository, analyticsRepository);
       failure = const Failure.serverError(
         StatusCode.http500,
         'INTERNAL SERVER ERROR',
@@ -103,20 +47,20 @@ void main() {
       'should emit an the a success state',
       build: () {
         provideDummy(
-          Either<Failure, Unit>.right(unit),
+          Either<Failure, AuthResponse>.right(AuthResponse()),
         );
-        when(authRepository.login(any, any))
-            .thenAnswer((_) async => Either<Failure, Unit>.right(unit));
+        when(authRepository.loginWithProvider(any)).thenAnswer(
+          (_) async => Either<Failure, AuthResponse>.right(AuthResponse()),
+        );
 
         return loginBloc;
       },
-      act: (LoginBloc bloc) => bloc.login(email, password),
+      act: (LoginBloc bloc) => bloc.loginWithProvider(OAuthProvider.google),
       expect: () => <dynamic>[
-        LoginState.initial().copyWith(emailAddress: email),
-        LoginState(
+        LoginState.initial(),
+        const LoginState(
           isLoading: false,
-          emailAddress: email,
-          loginStatus: const LoginStatus.success(),
+          loginStatus: LoginStatus.success(),
         ),
       ],
     );
@@ -124,93 +68,46 @@ void main() {
       'should emit a failed state',
       build: () {
         provideDummy(
-          Either<Failure, Unit>.left(failure),
+          Either<Failure, AuthResponse>.left(failure),
         );
-        when(authRepository.login(any, any))
-            .thenAnswer((_) async => Either<Failure, Unit>.left(failure));
+        when(authRepository.loginWithProvider(any)).thenAnswer(
+          (_) async => Either<Failure, AuthResponse>.left(failure),
+        );
 
         return loginBloc;
       },
-      act: (LoginBloc bloc) => bloc.login(email, password),
+      act: (LoginBloc bloc) => bloc.loginWithProvider(OAuthProvider.google),
       expect: () => <dynamic>[
-        LoginState.initial().copyWith(emailAddress: email),
+        LoginState.initial(),
         LoginState(
           isLoading: false,
-          emailAddress: email,
           loginStatus: LoginStatus.failed(failure),
         ),
+        LoginState.initial().copyWith(isLoading: false),
       ],
     );
     blocTest<LoginBloc, LoginState>(
       'should emit a unexpected error state',
       build: () {
         provideDummy(
-          Either<Failure, Unit>.left(
+          Either<Failure, AuthResponse>.left(
             Failure.unexpected(throwsException.toString()),
           ),
         );
-        when(authRepository.login(any, any)).thenThrow(throwsException);
+        when(authRepository.loginWithProvider(any)).thenThrow(throwsException);
 
         return loginBloc;
       },
-      act: (LoginBloc bloc) => bloc.login(email, password),
+      act: (LoginBloc bloc) => bloc.loginWithProvider(OAuthProvider.google),
       expect: () => <dynamic>[
-        LoginState.initial().copyWith(emailAddress: email),
+        LoginState.initial(),
         LoginState(
           isLoading: false,
-          emailAddress: email,
           loginStatus: LoginStatus.failed(
             Failure.unexpected(throwsException.toString()),
           ),
         ),
-      ],
-    );
-    blocTest<LoginBloc, LoginState>(
-      'should emit an invalid email error state',
-      build: () {
-        provideDummy(
-          Either<Failure, Unit>.left(
-            const Failure.invalidEmailFormat(),
-          ),
-        );
-        when(authRepository.login(any, any)).thenThrow(throwsException);
-
-        return loginBloc;
-      },
-      act: (LoginBloc bloc) => bloc.login('email', password),
-      expect: () => <dynamic>[
-        LoginState.initial().copyWith(emailAddress: 'email'),
-        const LoginState(
-          isLoading: false,
-          emailAddress: 'email',
-          loginStatus: LoginStatus.failed(
-            Failure.invalidEmailFormat(),
-          ),
-        ),
-      ],
-    );
-    blocTest<LoginBloc, LoginState>(
-      'should emit an invalid password error state',
-      build: () {
-        provideDummy(
-          Either<Failure, Unit>.left(
-            const Failure.exceedingCharacterLength(min: 6),
-          ),
-        );
-        when(authRepository.login(any, any)).thenThrow(throwsException);
-
-        return loginBloc;
-      },
-      act: (LoginBloc bloc) => bloc.login(email, 'pass'),
-      expect: () => <dynamic>[
-        LoginState.initial().copyWith(emailAddress: email),
-        LoginState(
-          isLoading: false,
-          emailAddress: email,
-          loginStatus: const LoginStatus.failed(
-            Failure.exceedingCharacterLength(min: 6),
-          ),
-        ),
+        LoginState.initial().copyWith(isLoading: false),
       ],
     );
   });

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pasa/app/themes/app_colors.dart';
 import 'package:pasa/app/themes/app_text_style.dart';
 
-final class AppTheme {
+abstract final class AppTheme {
   /// Standard `ThemeData` for App UI.
   static final ThemeData _baseTheme = ThemeData(
     visualDensity: VisualDensity.adaptivePlatformDensity,

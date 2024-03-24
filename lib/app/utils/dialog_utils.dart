@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:animations/animations.dart';
 import 'package:flash/flash.dart';
 import 'package:flash/flash_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:pasa/app/helpers/extensions/build_context_ext.dart';
 import 'package:pasa/app/themes/app_spacing.dart';
 import 'package:pasa/app/themes/app_theme.dart';
+import 'package:pasa/app/utils/common_utils.dart';
 import 'package:pasa/core/presentation/widgets/dialogs/confirmation_dialog.dart';
 
 // ignore_for_file: long-method,long-parameter-list
@@ -19,13 +18,7 @@ final class DialogUtils {
       await DialogUtils.showConfirmationDialog(
         context,
         message: context.i18n.dialog__message__exit_message,
-        onPositivePressed: () {
-          if (Platform.isAndroid) {
-            SystemNavigator.pop();
-          } else if (Platform.isIOS) {
-            exit(0);
-          }
-        },
+        onPositivePressed: CommonUtils.closeApp,
       ) ??
       false;
 
@@ -66,13 +59,18 @@ final class DialogUtils {
     Icon? icon,
     Duration? duration,
     FlashPosition? position,
+    Color? backgroundColor,
+    Color? surfaceTint,
+    bool enableSurfaceTint = false,
   }) =>
       context.showFlash<void>(
         duration: duration ?? const Duration(seconds: 3),
         builder: (BuildContext context, FlashController<void> controller) =>
             FlashBar<void>(
           controller: controller,
-          backgroundColor: context.colorScheme.background,
+          backgroundColor: backgroundColor ?? context.colorScheme.background,
+          surfaceTintColor:
+              enableSurfaceTint ? surfaceTint : Colors.transparent,
           shouldIconPulse: false,
           position: position ?? FlashPosition.bottom,
           behavior: FlashBehavior.floating,

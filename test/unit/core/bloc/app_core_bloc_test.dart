@@ -30,6 +30,8 @@ void main() {
       AppScrollController.profile:
           ScrollController(debugLabel: AppScrollController.profile.name),
     };
+    when(analyticsRepository.logOnOpenApp())
+        .thenAnswer((_) => Future<void>.value());
   });
 
   tearDown(() {
@@ -39,7 +41,52 @@ void main() {
     appCoreBloc.close();
   });
 
-  group('AppCore setScrollControllers', () {
+  group('initialize', () {
+    blocTest<AppCoreBloc, AppCoreState>(
+      'should emit true on isOnBoardingDone flag',
+      build: () {
+        when(localStorageRepository.getIsOnboardingDone())
+            .thenAnswer((_) => Future<bool>.value(true));
+        return appCoreBloc;
+      },
+      act: (AppCoreBloc bloc) async => bloc.initialize(),
+      expect: () => <AppCoreState>[
+        appCoreBloc.state.copyWith(isOnboardingDone: true),
+      ],
+    );
+    blocTest<AppCoreBloc, AppCoreState>(
+      'should emit false on isOnBoardingDone flag',
+      build: () {
+        when(localStorageRepository.getIsOnboardingDone())
+            .thenAnswer((_) => Future<bool>.value(false));
+        return appCoreBloc;
+      },
+      act: (AppCoreBloc bloc) async => bloc.initialize(),
+      expect: () => <AppCoreState>[
+        appCoreBloc.state.copyWith(isOnboardingDone: false),
+      ],
+    );
+  });
+
+  group('setOnboardingDone', () {
+    blocTest<AppCoreBloc, AppCoreState>(
+      'should set isOnboardingDone to true',
+      build: () {
+        when(localStorageRepository.setIsOnboardingDone())
+            .thenAnswer((_) => Future<void>.value());
+        return appCoreBloc;
+      },
+      act: (AppCoreBloc bloc) async => bloc.setOnboardingDone(),
+      expect: () => <AppCoreState>[
+        appCoreBloc.state.copyWith(isOnboardingDone: true),
+      ],
+      verify: (AppCoreBloc bloc) {
+        expect(bloc.isOnboardingDone, true);
+      },
+    );
+  });
+
+  group('setScrollControllers', () {
     blocTest<AppCoreBloc, AppCoreState>(
       'should set scrollControllers',
       build: () => appCoreBloc,

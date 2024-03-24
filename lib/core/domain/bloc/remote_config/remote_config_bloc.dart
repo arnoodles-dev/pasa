@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
 import 'package:mobile_service_core/features/remote_config/i_remote_config_repository.dart';
@@ -22,10 +23,11 @@ class RemoteConfigBloc extends Cubit<Map<String, dynamic>> {
 
   final IRemoteConfigRepository _remoteConfigRepository;
   final IDeviceRepository _deviceRepository;
+  late StreamSubscription<dynamic> _remoteConfigSubscription;
 
   Future<void> initialize() async {
     await fetchRemoteConfig();
-    await _remoteConfigRepository
+    _remoteConfigSubscription = await _remoteConfigRepository
         .initializeRemoteConfig((_) => fetchRemoteConfig());
     await updateLocalization();
   }
@@ -48,12 +50,9 @@ class RemoteConfigBloc extends Cubit<Map<String, dynamic>> {
     }
   }
 
-  Map<String, dynamic> getLocale(String locale) =>
-      jsonDecode(state[locale] as String) as Map<String, dynamic>;
-
   bool get isMaintenance {
     try {
-      final String configValue = state['isMaintenance'] as String;
+      final String configValue = state['is_maintenance'] as String;
       return configValue.toBoolean;
     } catch (_) {
       return false;
@@ -62,7 +61,7 @@ class RemoteConfigBloc extends Cubit<Map<String, dynamic>> {
 
   bool get isForceUpdate {
     try {
-      final String configValue = state['minSupportedVersion'] as String;
+      final String configValue = state['min_supported_version'] as String;
       return _isForceUpdate(configValue);
     } catch (_) {
       return false;
@@ -71,10 +70,10 @@ class RemoteConfigBloc extends Cubit<Map<String, dynamic>> {
 
   String? get storeLink {
     try {
-      if (Platform.isAndroid) {
-        return state['android_storelink'] as String;
-      } else if (Platform.isIOS) {
-        return state['ios_storelink'] as String;
+      if (defaultTargetPlatform case TargetPlatform.android) {
+        return state['android_store_link'] as String;
+      } else if (defaultTargetPlatform case TargetPlatform.iOS) {
+        return state['ios_store_link'] as String;
       } else {
         return null;
       }
@@ -111,5 +110,11 @@ class RemoteConfigBloc extends Cubit<Map<String, dynamic>> {
     } catch (e) {
       // Do nothing, a fallback file is already generated on app startup
     }
+  }
+
+  @override
+  Future<void> close() {
+    _remoteConfigSubscription.cancel();
+    return super.close();
   }
 }

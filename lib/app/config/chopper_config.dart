@@ -8,10 +8,6 @@ import 'package:pasa/app/config/app_config.dart';
 import 'package:pasa/app/constants/enum.dart';
 import 'package:pasa/app/constants/trusted_cetificate.dart';
 import 'package:pasa/app/helpers/converters/json_serializable_converter.dart';
-import 'package:pasa/core/data/dto/user.dto.dart';
-import 'package:pasa/core/data/service/user_service.dart';
-import 'package:pasa/features/auth/data/dto/login_response.dto.dart';
-import 'package:pasa/features/auth/data/service/auth_service.dart';
 import 'package:pasa/features/home/data/dto/post.dto.dart';
 import 'package:pasa/features/home/data/service/post_service.dart';
 import 'package:pretty_chopper_logger/pretty_chopper_logger.dart';
@@ -20,15 +16,11 @@ final class ChopperConfig {
   final Uri _baseUrl = Uri.parse(AppConfig.baseApiUrl);
 
   final List<ChopperService> _services = <ChopperService>[
-    AuthService.create(),
-    UserService.create(),
     PostService.create(),
   ];
 
   final JsonSerializableConverter _converter = const JsonSerializableConverter(
     <Type, dynamic Function(Map<String, dynamic>)>{
-      LoginResponseDTO: LoginResponseDTO.fromJson,
-      UserDTO: UserDTO.fromJson,
       PostDTO: PostDTO.fromJson,
     },
   );

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:chopper/chopper.dart' as chopper;
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -26,6 +27,7 @@ Future<void> setupInjection() async {
   TestWidgetsFlutterBinding.ensureInitialized();
   PathProviderPlatform.instance = MockPathProviderPlatform();
   SharedPreferences.setMockInitialValues(<String, Object>{});
+
   initializeSingletons();
   _mockPackageInfo();
   await Future.wait(<Future<void>>[
@@ -44,14 +46,70 @@ void _mockPackageInfo() {
   );
 }
 
+AndroidDeviceInfo mockAndroidDeviceInfo({
+  String? phoneModel,
+  String? version,
+}) =>
+    AndroidDeviceInfo.fromMap(<String, dynamic>{
+      'model': phoneModel ?? 'model',
+      'version': <String, dynamic>{
+        'baseOS': 'baseOS',
+        'codename': 'codename',
+        'incremental': 'incremental',
+        'previewSdkInt': 1,
+        'release': version ?? 'release',
+        'sdkInt': 1,
+        'securityPatch': 'securityPatch',
+      },
+      'board': 'board',
+      'bootloader': 'bootloader',
+      'brand': 'brand',
+      'device': 'device',
+      'display': 'display',
+      'fingerprint': 'fingerprint',
+      'hardware': 'hardware',
+      'host': 'host',
+      'id': 'id',
+      'manufacturer': 'manufacturer',
+      'product': 'product',
+      'tags': 'tags',
+      'type': 'type',
+      'isPhysicalDevice': false,
+      'serialNumber': 'serialNumber',
+      'displayMetrics': <String, double>{
+        'widthPx': 0.0,
+        'heightPx': 0.0,
+        'xDpi': 0.0,
+        'yDpi': 0.0,
+      },
+    });
+
+IosDeviceInfo mockIosDeviceInfo({
+  String? phoneModel,
+  String? os,
+  String? version,
+}) =>
+    IosDeviceInfo.fromMap(<String, dynamic>{
+      'data': <String, dynamic>{},
+      'name': 'name',
+      'systemName': os ?? 'systemName',
+      'systemVersion': version ?? 'systemVersion',
+      'model': phoneModel ?? 'model',
+      'localizedModel': 'localizedModel',
+      'isPhysicalDevice': 'isPhysicalDevice',
+      'utsname': <String, dynamic>{
+        'sysname': 'sysname',
+        'nodename': 'nodename',
+        'release': 'release',
+        'version': 'version',
+        'machine': 'machine',
+      },
+    });
+
 User get mockUser => UserDTO(
-      uid: 1,
+      uid: '',
       email: 'exampe@email.com',
-      firstName: 'test',
-      lastName: 'test',
-      gender: 'Male',
-      contactNumber: '123456789',
-      birthday: DateTime(2000),
+      createdAt: DateTime(2000).toIso8601String(),
     ).toDomain();
 
 List<Post> get mockPosts => List<Post>.generate(2, (_) => mockPost);

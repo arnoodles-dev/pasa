@@ -2,11 +2,9 @@ import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:pasa/app/constants/constant.dart';
 import 'package:pasa/app/constants/enum.dart';
 import 'package:pasa/app/constants/mock_data.dart';
-import 'package:pasa/app/constants/route_name.dart';
 import 'package:pasa/app/helpers/extensions/build_context_ext.dart';
 import 'package:pasa/app/helpers/injection.dart';
 import 'package:pasa/app/themes/app_spacing.dart';
@@ -16,10 +14,7 @@ import 'package:pasa/app/utils/error_message_utils.dart';
 import 'package:pasa/core/domain/bloc/app_core/app_core_bloc.dart';
 import 'package:pasa/core/domain/bloc/theme/theme_bloc.dart';
 import 'package:pasa/core/domain/entity/failure.dart';
-import 'package:pasa/core/domain/entity/user.dart';
 import 'package:pasa/core/presentation/widgets/pasa_app_bar.dart';
-import 'package:pasa/core/presentation/widgets/pasa_avatar.dart';
-import 'package:pasa/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:pasa/features/home/domain/bloc/post/post_bloc.dart';
 import 'package:pasa/features/home/domain/entity/post.dart';
 import 'package:pasa/features/home/presentation/widgets/empty_post.dart';
@@ -47,20 +42,6 @@ class HomeScreen extends HookWidget {
             icon: Theme.of(context).brightness == Brightness.dark
                 ? Icon(Icons.light_mode, color: iconColor)
                 : Icon(Icons.dark_mode, color: iconColor),
-          ),
-          BlocBuilder<AuthBloc, AuthState>(
-            builder: (BuildContext context, AuthState state) => state.maybeWhen(
-              orElse: SizedBox.shrink,
-              authenticated: (User user) => GestureDetector(
-                onTap: () =>
-                    GoRouter.of(context).goNamed(RouteName.profile.name),
-                child: PasaAvatar(
-                  size: 32,
-                  imageUrl: user.avatar?.getOrCrash(),
-                  padding: const EdgeInsets.all(Insets.small),
-                ),
-              ),
-            ),
           ),
         ],
       ),

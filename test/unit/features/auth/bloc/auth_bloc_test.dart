@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
@@ -11,22 +13,26 @@ import 'package:pasa/core/domain/entity/user.dart';
 import 'package:pasa/core/domain/interface/i_user_repository.dart';
 import 'package:pasa/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:pasa/features/auth/domain/interface/i_auth_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 import '../../../../utils/test_utils.dart';
 import 'auth_bloc_test.mocks.dart';
 
+// ignore_for_file: always_specify_types, strict_raw_type
 @GenerateNiceMocks(<MockSpec<dynamic>>[
   MockSpec<IUserRepository>(),
   MockSpec<AuthBloc>(),
   MockSpec<IAuthRepository>(),
   MockSpec<IAnalyticsRepository>(),
   MockSpec<ICrashlyticsRepository>(),
+  MockSpec<StreamSubscription>(),
 ])
 void main() {
   late MockIUserRepository userRepository;
   late MockIAuthRepository authRepository;
   late MockIAnalyticsRepository analyticsRepository;
   late MockICrashlyticsRepository crashlyticsRepository;
+  late MockStreamSubscription<supabase.AuthState> mockStreamSubscription;
   late AuthBloc authBloc;
 
   setUp(() {
@@ -37,19 +43,37 @@ void main() {
     authBloc = AuthBloc(
       userRepository,
       authRepository,
-      analyticsRepository,
       crashlyticsRepository,
     );
+    mockStreamSubscription = MockStreamSubscription<supabase.AuthState>();
+    when(authRepository.onAuthStateChange(any))
+        .thenAnswer((_) => mockStreamSubscription);
   });
 
   tearDown(() {
     authBloc.close();
+    mockStreamSubscription.cancel();
     reset(analyticsRepository);
     reset(userRepository);
     reset(authRepository);
   });
 
   group('AuthBloc initialize', () {
+    blocTest<AuthBloc, AuthState>(
+      'should emit an unauthenticated when onboarding is not done',
+      build: () {
+        provideDummy(Either<Failure, User>.right(mockUser));
+        when(userRepository.user)
+            .thenAnswer((_) async => Either<Failure, User>.right(mockUser));
+
+        return authBloc;
+      },
+      act: (AuthBloc bloc) => bloc.initialize(isOnboardingDone: false),
+      expect: () => <AuthState>[
+        const AuthState.initial(),
+        const AuthState.unauthenticated(),
+      ],
+    );
     blocTest<AuthBloc, AuthState>(
       'should emit an unauthenticated with null user state',
       build: () {
@@ -103,7 +127,6 @@ void main() {
       authBloc = AuthBloc(
         userRepository,
         authRepository,
-        analyticsRepository,
         crashlyticsRepository,
       );
       provideDummy(Either<Failure, User>.right(mockUser));
@@ -173,7 +196,6 @@ void main() {
       authBloc = AuthBloc(
         userRepository,
         authRepository,
-        analyticsRepository,
         crashlyticsRepository,
       );
       provideDummy(Either<Failure, User>.right(mockUser));
@@ -242,7 +264,6 @@ void main() {
       authBloc = AuthBloc(
         userRepository,
         authRepository,
-        analyticsRepository,
         crashlyticsRepository,
       );
       provideDummy(

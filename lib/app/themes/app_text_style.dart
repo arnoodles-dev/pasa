@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 /// App Text Style Definitions
 
-final class AppTextStyle {
+abstract final class AppTextStyle {
   static const TextStyle _baseTextStyle = TextStyle(
     fontWeight: AppFontWeight.regular,
   );
@@ -106,7 +106,7 @@ final class AppTextStyle {
   );
 }
 
-class AppFontWeight {
+abstract final class AppFontWeight {
   /// FontWeight value of `w900`
   static const FontWeight black = FontWeight.w900;
 

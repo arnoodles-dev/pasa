@@ -17,4 +17,6 @@ final class AppConfig {
   static bool get enablePerformanceMonitor =>
       dotenv.get('ENABLE_PERFORMANCE_MONITOR').toBoolean;
   static bool get enableAnalytics => dotenv.get('ENABLE_ANALYTICS').toBoolean;
+  static String get iosAuthClientId => dotenv.get('IOS_AUTH_CLIENT_ID');
+  static String get webAuthClientId => dotenv.get('WEB_AUTH_CLIENT_ID');
 }

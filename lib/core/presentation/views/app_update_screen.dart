@@ -4,6 +4,7 @@ import 'package:pasa/app/constants/enum.dart';
 import 'package:pasa/app/generated/assets.gen.dart';
 import 'package:pasa/app/helpers/extensions/build_context_ext.dart';
 import 'package:pasa/app/themes/app_spacing.dart';
+import 'package:pasa/app/themes/app_text_style.dart';
 import 'package:pasa/app/utils/url_launcher_utils.dart';
 import 'package:pasa/core/domain/bloc/remote_config/remote_config_bloc.dart';
 import 'package:pasa/core/presentation/widgets/pasa_button.dart';
@@ -51,7 +52,7 @@ class AppUpdateScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: context.textTheme.displaySmall?.copyWith(
                       color: context.colorScheme.primary,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: AppFontWeight.medium,
                     ),
                   ),
                 ),

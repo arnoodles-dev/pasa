@@ -1,15 +1,14 @@
-import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:logger/logger.dart';
+import 'package:mobile_service_core/features/analytics/i_analytics_repository.dart';
 import 'package:pasa/app/helpers/extensions/cubit_ext.dart';
-import 'package:pasa/app/helpers/extensions/either_ext.dart';
+import 'package:pasa/app/helpers/injection.dart';
 import 'package:pasa/core/domain/entity/failure.dart';
-import 'package:pasa/core/domain/entity/value_object.dart';
-import 'package:pasa/core/domain/interface/i_local_storage_repository.dart';
 import 'package:pasa/features/auth/domain/interface/i_auth_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'login_bloc.freezed.dart';
 part 'login_state.dart';
@@ -18,50 +17,62 @@ part 'login_state.dart';
 class LoginBloc extends Cubit<LoginState> {
   LoginBloc(
     this._authRepository,
-    this._localStorageRepository,
-  ) : super(LoginState.initial()) {
-    initialize();
-  }
+    this._analyticsRepository,
+  ) : super(LoginState.initial());
 
   final IAuthRepository _authRepository;
-  final ILocalStorageRepository _localStorageRepository;
+  final IAnalyticsRepository _analyticsRepository;
+  final Logger logger = getIt<Logger>();
 
-  Future<void> initialize() async {
-    final String? email = await _localStorageRepository.getLastLoggedInEmail();
-    safeEmit(state.copyWith(emailAddress: email, isLoading: false));
-  }
-
-  Future<void> login(String email, String password) async {
+  Future<void> loginWithProvider(OAuthProvider provider) async {
     try {
-      safeEmit(state.copyWith(isLoading: true, emailAddress: email));
-      final EmailAddress validEmail = EmailAddress(email);
-      final Password validPassword = Password(password);
+      safeEmit(state.copyWith(isLoading: true));
 
-      if (validEmail.isValid() && validPassword.isValid()) {
-        final Either<Failure, Unit> possibleFailure =
-            await _authRepository.login(validEmail, validPassword);
+      final Either<Failure, AuthResponse> possibleFailure =
+          await _authRepository.loginWithProvider(provider);
 
-        possibleFailure.fold(
-          _emitFailure,
-          (_) => safeEmit(
+      possibleFailure.fold(
+        _emitFailure,
+        (_) async {
+          await _analyticsRepository.logLogin(provider.name);
+          safeEmit(
             state.copyWith(
               isLoading: false,
               loginStatus: const LoginStatus.success(),
             ),
-          ),
-        );
-      } else {
-        _emitFailure(
-          !validEmail.isValid()
-              ? validEmail.value.asLeft()
-              : validPassword.value.asLeft(),
-        );
-      }
+          );
+        },
+      );
     } catch (error) {
-      log(error.toString());
+      logger.e(error.toString());
       _emitFailure(Failure.unexpected(error.toString()));
     }
   }
+  //TODO: implement this when sms provider is available
+  // Future<void> loginWithPhoneNumber(String phoneNumber) async {
+  //   try {
+  //     safeEmit(state.copyWith(isLoading: true));
+  //     final PhoneNumber validPhoneNumber = PhoneNumber(phoneNumber);
+  //     if (validPhoneNumber.isValid()) {
+  //       final Either<Failure, Unit> possibleFailure =
+  //           await _authRepository.loginWithPhoneNumber(validPhoneNumber);
+  //       possibleFailure.fold(
+  //         _emitFailure,
+  //         (_) => safeEmit(
+  //           state.copyWith(
+  //             isLoading: false,
+  //             loginStatus: const LoginStatus.success(),
+  //           ),
+  //         ),
+  //       );
+  //     } else {
+  //       _emitFailure(const Failure.invalidPhoneNumber());
+  //     }
+  //   } catch (error) {
+  //     logger.e(error.toString());
+  //     _emitFailure(Failure.unexpected(error.toString()));
+  //   }
+  // }
 
   void _emitFailure(Failure failure) {
     safeEmit(
@@ -70,8 +81,11 @@ class LoginBloc extends Cubit<LoginState> {
         loginStatus: LoginStatus.failed(failure),
       ),
     );
+    // emit the initial state to reset the error
+    safeEmit(
+      state.copyWith(
+        loginStatus: const LoginStatus.initial(),
+      ),
+    );
   }
-
-  void onEmailAddressChanged(String emailAddress) =>
-      safeEmit(state.copyWith(emailAddress: emailAddress));
 }

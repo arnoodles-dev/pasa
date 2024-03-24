@@ -20,7 +20,7 @@ final class Gap extends StatelessWidget {
   Widget build(BuildContext context) => gap.Gap(_size);
 }
 
-final class Insets {
+abstract final class Insets {
   const Insets._();
 
   static const double scale = 1;
