@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:logger/logger.dart';
 import 'package:mobile_service/mobile_service_repository.dart';
 import 'package:mobile_service_core/features/analytics/i_analytics_repository.dart';
@@ -28,8 +27,6 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder, Env env) async {
   await initializeEnvironmentConfig(env);
   await configureDependencies(env);
   await _initializeBackendServices();
-  // TODO: add svg paths to preload them on initialization
-  await _preloadSVG(<String>[]);
 
   if (kDebugMode) {
     Bloc.observer = getIt<AppBlocObserver>();
@@ -101,15 +98,5 @@ Future<void> initializeEnvironmentConfig(Env env) async {
       await dotenv.load(fileName: Assets.env.envStaging);
     case Env.production:
       await dotenv.load(fileName: Assets.env.envProduction);
-  }
-}
-
-Future<void> _preloadSVG(List<String> assetPaths) async {
-  for (final String path in assetPaths) {
-    final SvgAssetLoader loader = SvgAssetLoader(path);
-    await svg.cache.putIfAbsent(
-      loader.cacheKey(null),
-      () => loader.loadBytes(null),
-    );
   }
 }

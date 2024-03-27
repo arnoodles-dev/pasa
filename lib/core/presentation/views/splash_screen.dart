@@ -3,11 +3,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:pasa/app/constants/constant.dart';
 import 'package:pasa/app/helpers/extensions/build_context_ext.dart';
 import 'package:pasa/app/themes/app_spacing.dart';
+import 'package:pasa/app/themes/app_text_style.dart';
 import 'package:pasa/core/domain/bloc/app_core/app_core_bloc.dart';
 import 'package:pasa/core/domain/bloc/remote_config/remote_config_bloc.dart';
-import 'package:pasa/core/presentation/widgets/app_title.dart';
 import 'package:pasa/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:safe_device/safe_device.dart';
 
@@ -94,18 +95,28 @@ class SplashScreen extends HookWidget {
     );
 
     return Scaffold(
-      backgroundColor: context.colorScheme.background,
-      body: const SafeArea(
+      backgroundColor: context.colorScheme.primary,
+      body: SafeArea(
         child: Center(
           child: Column(
             children: <Widget>[
               Flexible(
                 child: Center(
-                  child: AppTitle(),
+                  child: Text(
+                    Constant.appName.toUpperCase().split('').join(' '),
+                    textAlign: TextAlign.center,
+                    style: context.textTheme.displayLarge?.copyWith(
+                      color: context.colorScheme.onPrimary,
+                      fontSize: 84,
+                      fontWeight: AppFontWeight.black,
+                    ),
+                  ),
                 ),
               ),
               Flexible(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: context.colorScheme.onPrimary,
+                ),
               ),
             ],
           ),
