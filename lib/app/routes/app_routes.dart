@@ -1,7 +1,9 @@
 part of 'app_router.dart';
 
 // ignore_for_file: long-method
-List<RouteBase> _getRoutes(GlobalKey<NavigatorState> rootNavigatorKey) =>
+List<RouteBase> _getRoutes(
+  GlobalKey<NavigatorState> rootNavigatorKey,
+) =>
     <RouteBase>[
       GoRoute(
         path: RouteName.initial.path,
@@ -10,10 +12,39 @@ List<RouteBase> _getRoutes(GlobalKey<NavigatorState> rootNavigatorKey) =>
             const SplashScreen(),
       ),
       GoRoute(
+        path: RouteName.update.path,
+        name: RouteName.update.name,
+        builder: (BuildContext context, GoRouterState state) =>
+            const AppUpdateScreen(),
+      ),
+      GoRoute(
+        path: RouteName.maintenance.path,
+        name: RouteName.maintenance.name,
+        builder: (BuildContext context, GoRouterState state) =>
+            const MaintenanceScreen(),
+      ),
+      GoRoute(
+        path: RouteName.onboarding.path,
+        name: RouteName.onboarding.name,
+        builder: (BuildContext context, GoRouterState state) =>
+            const OnboardingScreen(),
+      ),
+      GoRoute(
         path: RouteName.login.path,
         name: RouteName.login.name,
         builder: (BuildContext context, GoRouterState state) =>
             const LoginScreen(),
+      ),
+      GoRoute(
+        path: RouteName.createPost.path,
+        name: RouteName.createPost.name,
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            SlideTransitionPage(
+          key: state.pageKey,
+          isFullscreen: true,
+          child: const CreatePostScreen(),
+        ),
       ),
       StatefulShellRoute.indexedStack(
         builder: (
@@ -23,7 +54,6 @@ List<RouteBase> _getRoutes(GlobalKey<NavigatorState> rootNavigatorKey) =>
         ) =>
             MainScreen(navigationShell: navigationShell),
         branches: <StatefulShellBranch>[
-          // The route branch for the first tab of the bottom navigation bar.
           StatefulShellBranch(
             observers: <NavigatorObserver>[
               getIt<GoRouteObserver>(param1: RouteName.home.name),
@@ -52,17 +82,42 @@ List<RouteBase> _getRoutes(GlobalKey<NavigatorState> rootNavigatorKey) =>
               ),
             ],
           ),
-          // The route branch for the second tab of the bottom navigation bar.
           StatefulShellBranch(
             observers: <NavigatorObserver>[
-              getIt<GoRouteObserver>(param1: RouteName.profile.name),
+              getIt<GoRouteObserver>(param1: RouteName.activity.name),
             ],
             routes: <RouteBase>[
               GoRoute(
-                path: RouteName.profile.path,
-                name: RouteName.profile.name,
+                path: RouteName.activity.path,
+                name: RouteName.activity.name,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const ProfileScreen(),
+                    const ActivityScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            observers: <NavigatorObserver>[
+              getIt<GoRouteObserver>(param1: RouteName.message.name),
+            ],
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteName.message.path,
+                name: RouteName.message.name,
+                builder: (BuildContext context, GoRouterState state) =>
+                    const MessageScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            observers: <NavigatorObserver>[
+              getIt<GoRouteObserver>(param1: RouteName.account.name),
+            ],
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteName.account.path,
+                name: RouteName.account.name,
+                builder: (BuildContext context, GoRouterState state) =>
+                    const AccountScreen(),
               ),
             ],
           ),

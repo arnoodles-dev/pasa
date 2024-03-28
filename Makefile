@@ -5,12 +5,12 @@ LCOV=C:\ProgramData\chocolatey\lib\lcov\tools\bin\lcov
 
 ## Note: In windows, recommended terminal is cmd 
 
-ensure_flutter_version: ## Ensures flutter version is 3.19.1 
-	fvm install 3.19.1
-	fvm use 3.19.1
-	fvm global 3.19.1
+ensure_flutter_version: ## Ensures flutter version is 3.19.4 
+	fvm install 3.19.4
+	fvm use 3.19.4
+	fvm global 3.19.4
 
-## Note: If you are using a specific flutter version, change '3.19.1' to the desired '{flutter version}' you want to use
+## Note: If you are using a specific flutter version, change '3.19.4' to the desired '{flutter version}' you want to use
 
 clean: ## Delete the build/ and .dart_tool/ directories
 	fvm flutter clean
@@ -20,28 +20,32 @@ pub_clean: ## Empties the entire system cache to reclaim extra disk space or rem
 
 pub_get: ## Gets pubs
 	fvm flutter pub get
+	fvm flutter pub get --directory=plugins/google_mobile_service
+	fvm flutter pub get --directory=plugins/mobile_service_core
 
 pub_outdated: ## Check for outdated packages
 	fvm flutter pub outdated
+	fvm flutter pub outdated --directory=plugins/google_mobile_service
+	fvm flutter pub outdated --directory=plugins/mobile_service_core
 
 pub_repair: ## Performs a clean reinstallation of all packages in your system cache
 	fvm flutter pub cache repair
 
-l10n: ## Generates strings
-	fvm flutter pub run intl_utils:generate
+i18n: ## Generates strings
+	fvm dart run plugins/i18n_generator/lib/main.dart --output lib/app/generated/app_localization_mixin.gen.dart
 
 build_runner: ## This command generates the files for the code generated dependencies
-	fvm flutter pub run build_runner build --delete-conflicting-outputs
+	fvm dart run build_runner build --delete-conflicting-outputs
 
 build_runner_watch: ## This command generates the files for the code generated dependencies 'automatically during development' 
-	fvm flutter pub run build_runner watch --delete-conflicting-outputs
+	fvm dart run build_runner watch --delete-conflicting-outputs
 
 format: ## This command formats the codebase and run import sorter
-	fvm dart format lib test
+	fvm dart format lib/ test/ plugins/google_mobile_service/lib/ plugins/mobile_service_core/lib/ plugins/i18n_generator/lib/
 
-clean_rebuild: ensure_flutter_version clean pub_clean pub_get l10n build_runner format lint fix_lint
+clean_rebuild: ensure_flutter_version clean pub_clean pub_get i18n build_runner format lint fix_lint
 
-rebuild: ensure_flutter_version pub_get l10n build_runner format lint fix_lint
+rebuild: pub_get i18n build_runner format lint fix_lint
 
 lint: ## Analyzes the codebase for issues
 	fvm flutter analyze lib test
@@ -77,9 +81,9 @@ lcov_report_mac: ## Generates lcov report for macOS
 	open coverage/index.html		
 
 lcov_report_win:  ## Generates lcov report for Windows
-	perl ${LCOV} lcov --ignore-errors unused --remove  coverage/lcov.info  'lib/app/*' 'lib/bootstrap.dart' '*.g.dart'  '*.freezed.dart' '*.dto.dart' '*.config.dart' '*.chopper.dart' '*_webview.dart' '**/service/*' '**/dto/*' '**/entity/*' -o coverage/lcov.info
-	perl ${GENHTML} -o coverage/html coverage/lcov.info
-	CMD /C start coverage/html/index.html	
+	perl ${LCOV} lcov --ignore-errors unused --remove  coverage/lcov.info  'lib/app/*' 'lib/bootstrap.dart' '*.g.dart'  '*.freezed.dart' '*.dto.dart' '*.config.dart' '*.chopper.dart' '*_screen.dart' '*_webview.dart' '**/service/*' '**/dto/*' '**/entity/*' -o coverage/lcov.info
+	perl ${GENHTML} -o coverage coverage/lcov.info
+	CMD /C start coverage/index.html	
 
 lcov_win: lcov_gen lcov_report_win ## Generates the lcov report and automatically opens the coverage report for Windows
 
@@ -104,3 +108,5 @@ goldens_win: delete_goldens_win delete_failures_win update_goldens ## Deletes th
 
 goldens_mac: delete_goldens_mac delete_failures_mac update_goldens ## Deletes the existing goldens and failures and update the golden files for macOS
 
+build_android_dev:
+	sh scripts/build_android.sh "apk" "release" "development" "lib/main_development.dart" "development.apk"

@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:mobile_service_core/features/analytics/i_analytics_repository.dart';
+import 'package:mobile_service_core/features/crashlytics/i_crashlytics_repository.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pasa/app/constants/enum.dart';
@@ -9,33 +13,67 @@ import 'package:pasa/core/domain/entity/user.dart';
 import 'package:pasa/core/domain/interface/i_user_repository.dart';
 import 'package:pasa/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:pasa/features/auth/domain/interface/i_auth_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 import '../../../../utils/test_utils.dart';
 import 'auth_bloc_test.mocks.dart';
 
+// ignore_for_file: always_specify_types, strict_raw_type
 @GenerateNiceMocks(<MockSpec<dynamic>>[
   MockSpec<IUserRepository>(),
   MockSpec<AuthBloc>(),
   MockSpec<IAuthRepository>(),
+  MockSpec<IAnalyticsRepository>(),
+  MockSpec<ICrashlyticsRepository>(),
+  MockSpec<StreamSubscription>(),
 ])
 void main() {
   late MockIUserRepository userRepository;
   late MockIAuthRepository authRepository;
+  late MockIAnalyticsRepository analyticsRepository;
+  late MockICrashlyticsRepository crashlyticsRepository;
+  late MockStreamSubscription<supabase.AuthState> mockStreamSubscription;
   late AuthBloc authBloc;
 
   setUp(() {
     userRepository = MockIUserRepository();
     authRepository = MockIAuthRepository();
-    authBloc = AuthBloc(userRepository, authRepository);
+    analyticsRepository = MockIAnalyticsRepository();
+    crashlyticsRepository = MockICrashlyticsRepository();
+    authBloc = AuthBloc(
+      userRepository,
+      authRepository,
+      crashlyticsRepository,
+    );
+    mockStreamSubscription = MockStreamSubscription<supabase.AuthState>();
+    when(authRepository.onAuthStateChange(any))
+        .thenAnswer((_) => mockStreamSubscription);
   });
 
   tearDown(() {
     authBloc.close();
+    mockStreamSubscription.cancel();
+    reset(analyticsRepository);
     reset(userRepository);
     reset(authRepository);
   });
 
   group('AuthBloc initialize', () {
+    blocTest<AuthBloc, AuthState>(
+      'should emit an unauthenticated when onboarding is not done',
+      build: () {
+        provideDummy(Either<Failure, User>.right(mockUser));
+        when(userRepository.user)
+            .thenAnswer((_) async => Either<Failure, User>.right(mockUser));
+
+        return authBloc;
+      },
+      act: (AuthBloc bloc) => bloc.initialize(isOnboardingDone: false),
+      expect: () => <AuthState>[
+        const AuthState.initial(),
+        const AuthState.unauthenticated(),
+      ],
+    );
     blocTest<AuthBloc, AuthState>(
       'should emit an unauthenticated with null user state',
       build: () {
@@ -86,7 +124,11 @@ void main() {
 
   group('AuthBloc getUser ', () {
     setUp(() async {
-      authBloc = AuthBloc(userRepository, authRepository);
+      authBloc = AuthBloc(
+        userRepository,
+        authRepository,
+        crashlyticsRepository,
+      );
       provideDummy(Either<Failure, User>.right(mockUser));
       when(userRepository.user)
           .thenAnswer((_) async => Either<Failure, User>.right(mockUser));
@@ -151,7 +193,11 @@ void main() {
 
   group('AuthBloc logout ', () {
     setUp(() async {
-      authBloc = AuthBloc(userRepository, authRepository);
+      authBloc = AuthBloc(
+        userRepository,
+        authRepository,
+        crashlyticsRepository,
+      );
       provideDummy(Either<Failure, User>.right(mockUser));
       when(userRepository.user)
           .thenAnswer((_) async => Either<Failure, User>.right(mockUser));
@@ -215,7 +261,11 @@ void main() {
 
   group('AuthBloc authenticate', () {
     setUp(() async {
-      authBloc = AuthBloc(userRepository, authRepository);
+      authBloc = AuthBloc(
+        userRepository,
+        authRepository,
+        crashlyticsRepository,
+      );
       provideDummy(
         Either<Failure, User>.right(mockUser),
       );

@@ -28,7 +28,7 @@ class EmptyPost extends StatelessWidget {
                         bottom: Insets.xsmall,
                       ),
                       child: Text(
-                        context.l10n.post__empty_post__empty_post_message,
+                        context.i18n.post__empty_post__empty_post_message,
                         style: context.textTheme.titleLarge?.copyWith(
                           color: context.colorScheme.onBackground
                               .withOpacity(0.25),

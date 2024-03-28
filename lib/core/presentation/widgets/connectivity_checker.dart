@@ -62,7 +62,7 @@ class _ConnectivityCheckerState extends State<ConnectivityChecker> {
           content: Padding(
             padding: const EdgeInsets.symmetric(horizontal: Insets.small),
             child: Text(
-              context.l10n.common_error_no_internet_connection,
+              context.i18n.common_error_no_internet_connection,
               style: context.textTheme.bodyLarge
                   ?.copyWith(color: context.colorScheme.onBackground),
             ),

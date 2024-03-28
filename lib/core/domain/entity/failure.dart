@@ -17,6 +17,9 @@ class Failure with _$Failure {
 
   const factory Failure.invalidEmailFormat() = InvalidEmailFormat;
 
+  const factory Failure.invalidPhoneNumber() = InvalidPhoneNumber;
+  const factory Failure.sessionNotFound() = SessionNotFound;
+
   const factory Failure.invalidValue({required dynamic failedValue}) =
       InvalidValue;
 
@@ -30,4 +33,6 @@ class Failure with _$Failure {
   const factory Failure.storageError() = StorageError;
 
   const factory Failure.userNotFound() = UserNotFound;
+
+  const factory Failure.remoteConfigError() = RemoteConfigError;
 }

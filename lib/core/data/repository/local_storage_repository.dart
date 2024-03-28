@@ -1,15 +1,16 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
+import 'package:logger/logger.dart';
+import 'package:pasa/app/helpers/injection.dart';
 import 'package:pasa/core/domain/interface/i_local_storage_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final class _Keys {
   static const String accessToken = 'access_token';
-  static const String refreshToken = 'refresh_token';
-  static const String emailAddress = 'email_address';
+  static const String idToken = 'id_token';
+  static const String isOnboardingDone = 'is_onboarding_done';
 }
 
 @LazySingleton(as: ILocalStorageRepository)
@@ -22,51 +23,46 @@ class LocalStorageRepository implements ILocalStorageRepository {
   final FlutterSecureStorage _securedStorage;
   final SharedPreferences _unsecuredStorage;
 
+  Logger get logger => getIt<Logger>();
+
   /// Secured Storage services
   @override
   Future<String?> getAccessToken() =>
       _securedStorage.read(key: _Keys.accessToken);
   @override
-  Future<bool> setAccessToken(String? value) async {
+  Future<void> setAccessToken(String? value) async {
     try {
       await _securedStorage.write(key: _Keys.accessToken, value: value);
-
-      return true;
     } catch (error) {
-      log(error.toString());
-
-      return false;
+      logger.e(error.toString());
+      throw Exception(error);
     }
   }
 
   @override
-  Future<String?> getRefreshToken() =>
-      _securedStorage.read(key: _Keys.refreshToken);
+  Future<String?> getIdToken() => _securedStorage.read(key: _Keys.idToken);
   @override
-  Future<bool> setRefreshToken(String? value) async {
+  Future<void> setIdToken(String? value) async {
     try {
-      await _securedStorage.write(key: _Keys.refreshToken, value: value);
-
-      return true;
+      await _securedStorage.write(key: _Keys.idToken, value: value);
     } catch (error) {
-      log(error.toString());
-
-      return false;
+      logger.e(error.toString());
+      throw Exception(error);
     }
   }
 
   /// Unsecured storage services
   @override
-  Future<String?> getLastLoggedInEmail() async =>
-      _unsecuredStorage.getString(_Keys.emailAddress);
-  @override
-  Future<bool> setLastLoggedInEmail(String? value) async {
-    try {
-      return _unsecuredStorage.setString(_Keys.emailAddress, value ?? '');
-    } catch (error) {
-      log(error.toString());
+  Future<bool?> getIsOnboardingDone() async =>
+      _unsecuredStorage.getBool(_Keys.isOnboardingDone);
 
-      return false;
+  @override
+  Future<void> setIsOnboardingDone() async {
+    try {
+      await _unsecuredStorage.setBool(_Keys.isOnboardingDone, true);
+    } catch (error) {
+      logger.e(error.toString());
+      throw Exception(error);
     }
   }
 }

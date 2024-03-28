@@ -5,7 +5,6 @@ class LoginState with _$LoginState {
   const factory LoginState({
     required bool isLoading,
     required LoginStatus loginStatus,
-    String? emailAddress,
   }) = _LoginState;
 
   factory LoginState.initial() => const _LoginState(

@@ -1,11 +1,11 @@
-import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:logger/logger.dart';
 import 'package:pasa/app/helpers/extensions/cubit_ext.dart';
+import 'package:pasa/app/helpers/injection.dart';
 
 part 'app_life_cycle_bloc.freezed.dart';
 part 'app_life_cycle_state.dart';
@@ -39,7 +39,7 @@ class AppLifeCycleBloc extends Cubit<AppLifeCycleState>
         safeEmit(const AppLifeCycleState.hidden());
     }
     if (kDebugMode) {
-      log('AppLifeCycleState: $state');
+      getIt<Logger>().d('AppLifeCycleState: $state');
     }
   }
 }

@@ -56,7 +56,7 @@ class ConfirmationDialog extends StatelessWidget {
         ),
         actions: <Widget>[
           PasaButton(
-            text: negativeButtonText ?? context.l10n.common_no.toUpperCase(),
+            text: negativeButtonText ?? context.i18n.common_no.toUpperCase(),
             buttonType: ButtonType.text,
             onPressed: onNegativePressed ?? () => Navigator.of(context).pop(),
             padding: EdgeInsets.zero,
@@ -66,7 +66,7 @@ class ConfirmationDialog extends StatelessWidget {
             ),
           ),
           PasaButton(
-            text: positiveButtonText ?? context.l10n.common_yes.toUpperCase(),
+            text: positiveButtonText ?? context.i18n.common_yes.toUpperCase(),
             buttonType: ButtonType.text,
             onPressed: onPositivePressed ?? () => Navigator.of(context).pop(),
             padding: EdgeInsets.zero,

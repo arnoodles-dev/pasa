@@ -27,8 +27,10 @@ final class SlideTransitionPage extends CustomTransitionPage<void> {
   SlideTransitionPage({
     required LocalKey super.key,
     required super.child,
+    this.isFullscreen = false,
     this.transitionType = SlideTransitionType.bottomToTop,
   }) : super(
+          fullscreenDialog: isFullscreen,
           transitionsBuilder: (
             BuildContext context,
             Animation<double> animation,
@@ -43,6 +45,7 @@ final class SlideTransitionPage extends CustomTransitionPage<void> {
           ),
         );
   final SlideTransitionType transitionType;
+  final bool isFullscreen;
 
   static Animatable<Offset> getOffset(
     SlideTransitionType slideTransitionType,

@@ -1,46 +1,48 @@
-import 'dart:developer';
-
-import 'package:chopper/chopper.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
+import 'package:logger/logger.dart';
 import 'package:pasa/app/constants/enum.dart';
 import 'package:pasa/app/helpers/extensions/int_ext.dart';
-import 'package:pasa/app/helpers/extensions/status_code_ext.dart';
+import 'package:pasa/app/helpers/injection.dart';
 import 'package:pasa/core/data/dto/user.dto.dart';
-import 'package:pasa/core/data/service/user_service.dart';
 import 'package:pasa/core/domain/entity/failure.dart';
 import 'package:pasa/core/domain/entity/user.dart';
 import 'package:pasa/core/domain/interface/i_user_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 @LazySingleton(as: IUserRepository)
 class UserRepository implements IUserRepository {
-  UserRepository(
-    this._userService,
+  const UserRepository(
+    this._supabase,
   );
 
-  final UserService _userService;
+  final supabase.SupabaseClient _supabase;
+
+  Logger get logger => getIt<Logger>();
 
   @override
   Future<Either<Failure, User>> get user async {
     try {
-      final Response<dynamic> response = await _userService.getCurrentUser();
-
-      final StatusCode statusCode = response.statusCode.statusCode;
-
-      if (statusCode.isSuccess && response.body != null) {
-        final {'data': Map<String, dynamic> data} =
-            response.body as Map<String, dynamic>;
-        final UserDTO userDTO = UserDTO.fromJson(data);
-
+      final supabase.Session? session = _supabase.auth.currentSession;
+      if (session != null) {
+        final UserDTO userDTO = UserDTO.fromSupabase(session.user);
         return _validateUserData(userDTO);
       }
-
-      return left(Failure.serverError(statusCode, response.error.toString()));
+      return left(const Failure.sessionNotFound());
+    } on supabase.AuthException catch (error) {
+      return left(_onAuthError(error));
     } catch (error) {
-      log(error.toString());
-
+      logger.e(error.toString());
       return left(Failure.unexpected(error.toString()));
     }
+  }
+
+  Failure _onAuthError(supabase.AuthException error) {
+    logger.e(error.toString());
+    final int? code = int.tryParse(error.statusCode ?? '');
+    final StatusCode statusCode =
+        code != null ? code.statusCode : StatusCode.http000;
+    return Failure.serverError(statusCode, error.message);
   }
 
   Either<Failure, User> _validateUserData(UserDTO userDTO) {

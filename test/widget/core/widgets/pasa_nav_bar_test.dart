@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pasa/app/constants/enum.dart';
-import 'package:pasa/app/constants/route_name.dart';
+import 'package:pasa/app/routes/route_name.dart';
 import 'package:pasa/core/domain/bloc/app_core/app_core_bloc.dart';
 import 'package:pasa/core/domain/bloc/hidable/hidable_bloc.dart';
 import 'package:pasa/core/presentation/widgets/pasa_nav_bar.dart';
@@ -110,9 +110,19 @@ void main() {
             child: buildNavBar(setUpRouter(RouteName.home.path, 0)),
           ),
           GoldenTestScenario(
-            name: 'profile tab is selected',
+            name: 'activity tab is selected',
             constraints: const BoxConstraints(minWidth: 400),
             child: buildNavBar(setUpRouter(RouteName.profile.path, 1)),
+          ),
+          GoldenTestScenario(
+            name: 'message tab is selected',
+            constraints: const BoxConstraints(minWidth: 400),
+            child: buildNavBar(setUpRouter(RouteName.message.path, 1)),
+          ),
+          GoldenTestScenario(
+            name: 'account tab is selected',
+            constraints: const BoxConstraints(minWidth: 400),
+            child: buildNavBar(setUpRouter(RouteName.account.path, 1)),
           ),
         ],
       ),

@@ -1,0 +1,118 @@
+{
+  "project_info": {
+    "project_number": "75714035386",
+    "project_id": "pasa-flutter",
+    "storage_bucket": "pasa-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75714035386:android:bb01dd5febc967022c0c83",
+        "android_client_info": {
+          "package_name": "com.arnoodles.pasa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "75714035386-16q65iktanbtkjevqhqhvi11klekj7fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFiPDtqY1k6uGlU6lb2FUl5VEX-iiS7So"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "75714035386-16q65iktanbtkjevqhqhvi11klekj7fm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "75714035386-gg6jbnijsrgmas4ja1k8mehcv2pofepr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.arnoodles.pasa"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75714035386:android:e275384df920f4612c0c83",
+        "android_client_info": {
+          "package_name": "com.arnoodles.pasa.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "75714035386-16q65iktanbtkjevqhqhvi11klekj7fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFiPDtqY1k6uGlU6lb2FUl5VEX-iiS7So"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "75714035386-16q65iktanbtkjevqhqhvi11klekj7fm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "75714035386-gg6jbnijsrgmas4ja1k8mehcv2pofepr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.arnoodles.pasa"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75714035386:android:a4f4c123b42917702c0c83",
+        "android_client_info": {
+          "package_name": "com.arnoodles.pasa.stg"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "75714035386-16q65iktanbtkjevqhqhvi11klekj7fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFiPDtqY1k6uGlU6lb2FUl5VEX-iiS7So"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "75714035386-16q65iktanbtkjevqhqhvi11klekj7fm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "75714035386-gg6jbnijsrgmas4ja1k8mehcv2pofepr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.arnoodles.pasa"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

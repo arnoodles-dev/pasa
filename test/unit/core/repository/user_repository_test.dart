@@ -2,89 +2,81 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:pasa/core/data/dto/user.dto.dart';
 import 'package:pasa/core/data/repository/user_repository.dart';
-import 'package:pasa/core/data/service/user_service.dart';
 import 'package:pasa/core/domain/entity/failure.dart';
 import 'package:pasa/core/domain/entity/user.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
-import '../../../utils/test_utils.dart';
 import 'user_repository_test.mocks.dart';
 
-@GenerateNiceMocks(<MockSpec<dynamic>>[MockSpec<UserService>()])
+@GenerateNiceMocks(<MockSpec<dynamic>>[
+  MockSpec<supabase.SupabaseClient>(),
+  MockSpec<supabase.GoTrueClient>(),
+])
 void main() {
-  late UserService userService;
   late UserRepository userRepository;
-  late UserDTO user;
+  late MockSupabaseClient supabaseClient;
+  late MockGoTrueClient supabaseAuth;
+  final supabase.User user = supabase.User(
+    id: 'id',
+    appMetadata: <String, dynamic>{},
+    userMetadata: <String, dynamic>{},
+    aud: 'aud',
+    createdAt: DateTime.now().toIso8601String(),
+  );
 
   setUp(() {
-    userService = MockUserService();
-    userRepository = UserRepository(userService);
-    user = UserDTO.fromDomain(mockUser);
+    supabaseClient = MockSupabaseClient();
+    supabaseAuth = MockGoTrueClient();
+    userRepository = UserRepository(supabaseClient);
+    when(supabaseClient.auth).thenReturn(supabaseAuth);
   });
 
   tearDown(() {
-    provideDummy(mockChopperClient);
-    userService.client.dispose();
-    reset(userService);
+    reset(supabaseClient);
+    reset(supabaseAuth);
   });
 
   group('User', () {
     test(
       'should return some valid user',
       () async {
-        final Map<String, dynamic> data = <String, dynamic>{
-          'data': user.toJson(),
-        };
-        provideDummy(generateMockResponse<dynamic>(data, 200));
-        when(userService.getCurrentUser()).thenAnswer(
-          (_) async => generateMockResponse<Map<String, dynamic>>(data, 200),
+        when(supabaseAuth.currentSession).thenReturn(
+          supabase.Session(
+            accessToken: 'accessToken',
+            tokenType: 'tokenType',
+            user: user,
+          ),
         );
-
         final Either<Failure, User> userRepo = await userRepository.user;
-
         expect(userRepo.isRight(), true);
       },
     );
 
     test(
-      'should return none when an invalid user is returned',
+      'should return Failure when session is null',
       () async {
-        final UserDTO invalidUser = user.copyWith(email: 'email');
-        final Map<String, dynamic> data = <String, dynamic>{
-          'data': invalidUser.toJson(),
-        };
-        provideDummy(generateMockResponse<dynamic>(data, 200));
-        when(userService.getCurrentUser()).thenAnswer(
-          (_) async => generateMockResponse<Map<String, dynamic>>(data, 200),
-        );
-
+        when(supabaseAuth.currentSession).thenReturn(null);
         final Either<Failure, User> userRepo = await userRepository.user;
-
         expect(userRepo.isLeft(), true);
       },
     );
 
     test(
-      'should return none when an server error is encountered',
+      'should return Failure when an server error is encountered',
       () async {
-        final Map<String, dynamic> data = <String, dynamic>{'data': ''};
-        provideDummy(generateMockResponse<dynamic>(data, 500));
-        when(userService.getCurrentUser()).thenAnswer(
-          (_) async => generateMockResponse<Map<String, dynamic>>(data, 500),
+        when(supabaseClient.auth).thenThrow(
+          const supabase.AuthException('message', statusCode: '400'),
         );
-
         final Either<Failure, User> userRepo = await userRepository.user;
-
         expect(userRepo.isLeft(), true);
       },
     );
 
     test(
-      'should return none when an unexpected error occurs',
+      'should return Failure when an unexpected error occurs',
       () async {
-        when(userService.getCurrentUser()).thenThrow(throwsException);
-
+        when(supabaseClient.auth).thenThrow(throwsException);
         final Either<Failure, User> userRepo = await userRepository.user;
 
         expect(userRepo.isLeft(), true);

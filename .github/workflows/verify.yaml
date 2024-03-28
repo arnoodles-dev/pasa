@@ -1,0 +1,69 @@
+name: verify branch
+
+on:
+  push:
+    branches-ignore: [ main, v*, release/* ]
+
+jobs:
+  verify-semantic-pull-request:
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
+
+  build:
+    runs-on: "macos-latest"
+
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Get Flutter SDK version from fvm_config.json
+        uses: kuhnroyal/flutter-fvm-config-action@v2
+        with:
+          path: .fvm/fvm_config.json  
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: 📦 Install Dependencies
+        run: |
+          flutter pub get
+          flutter pub get --directory=plugins/google_mobile_service
+          flutter pub get --directory=plugins/mobile_service_core
+
+      - name: ⚙️ Run Setup
+        run: |
+          dart run plugins/i18n_generator/lib/main.dart --output ./lib/app/generated/app_localization_mixin.gen.dart
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: ✨ Check Formatting
+        run: dart format lib test
+
+      - name: 🕵️ Analyze
+        run: |
+          flutter analyze lib test
+          dart analyze lib test
+
+      - name: 🧪 Run Tests
+        run: flutter test --dart-define=CI=true --coverage
+        
+      - name: 📤 Upload Failed Goldens
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: goldens-failures
+          path: test/widget/**/failures
+
+      - name: 📊 Setup LCOV
+        uses: hrishikesh-kadam/setup-lcov@v1
+
+      - name: 📃 Generate LCOV Report
+        run:  |
+          lcov --ignore-errors unused --remove  coverage/lcov.info  'lib/app/*' 'lib/bootstrap.dart' '*.g.dart'  '*.freezed.dart' '*.dto.dart' '*.config.dart' '*.chopper.dart' '*_webview.dart' '*_screen.dart' '**/service/*' '**/dto/*' '**/entity/*' -o coverage/lcov.info
+          genhtml coverage/lcov.info -o coverage/     
+
+      - name: 📉 Check Code Coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v3
+        with:
+          path: ./coverage/lcov.info
+          min_coverage: 80

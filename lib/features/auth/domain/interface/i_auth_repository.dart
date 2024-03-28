@@ -1,9 +1,22 @@
+import 'dart:async';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:pasa/core/domain/entity/failure.dart';
-import 'package:pasa/core/domain/entity/value_object.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class IAuthRepository {
-  Future<Either<Failure, Unit>> login(EmailAddress email, Password password);
+  StreamSubscription<AuthState> onAuthStateChange(
+    void Function(AuthState)? onData,
+  );
+
+  Future<Either<Failure, AuthResponse>> loginWithProvider(
+    OAuthProvider provider,
+  );
+
+  //TODO: implement this when sms provider is available
+  // Future<Either<Failure, Unit>> loginWithPhoneNumber(
+  //   PhoneNumber phone,
+  // );
 
   Future<Either<Failure, Unit>> logout();
 }

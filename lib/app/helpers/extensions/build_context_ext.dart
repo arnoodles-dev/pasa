@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pasa/app/generated/l10n.dart';
+import 'package:pasa/app/helpers/app_localization.dart';
 
 extension BuildContextExt on BuildContext {
-  AppLocalizations get l10n => AppLocalizations.of(this);
+  AppLocalization get i18n => AppLocalization.of(this);
 
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
 
