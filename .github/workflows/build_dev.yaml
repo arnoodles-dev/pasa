@@ -45,6 +45,9 @@ jobs:
       - name: ✨ Check Formatting
         run: dart format lib test
 
+      - name: Build Version branch
+        run:  sh 'scripts/build_android_dev.sh'     
+
       - name: Get last successful commit
         uses: nrwl/last-successful-commit-action@v1
         id: last_successful_commit
@@ -61,9 +64,6 @@ jobs:
     runs-on: macos-latest
     needs: [ Setup ]
     steps:
-      - name: Build Version branch
-        run:  sh 'scripts/build_android_dev.sh'    
-
       - name: Deploy Apk to Firebase Dev
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
