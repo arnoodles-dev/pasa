@@ -50,7 +50,7 @@ jobs:
         id: last_successful_commit
         with:
           branch: ${{ github.ref_name }}
-          workflow_id: build_dev_qa.yaml
+          workflow_id: build_dev.yaml
           github_token: ${{ secrets.TOKEN }}
 
       - name: Prepare release notes
