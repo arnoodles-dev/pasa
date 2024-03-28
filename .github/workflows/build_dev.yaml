@@ -62,7 +62,7 @@ jobs:
     needs: [ Setup ]
     steps:
       - name: Build Version branch
-        run:  make build_android_dev   
+        run:  sh 'scripts/build_android_dev.sh'    
 
       - name: Deploy Apk to Firebase Dev
         uses: wzieba/Firebase-Distribution-Github-Action@v1
