@@ -30,6 +30,11 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Setup Java    
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '21'    
     
       - name: 📦 Install Dependencies
         run: |
