@@ -54,7 +54,7 @@ jobs:
           github_token: ${{ secrets.TOKEN }}
 
       - name: Prepare release notes
-        run: sh scripts/release_notes_qa_dev.sh ${{ steps.last_successful_commit.outputs.commit_hash }} ${{ github.ref_name }} ${{ github.run_number }}
+        run: sh scripts/release_notes_dev.sh ${{ steps.last_successful_commit.outputs.commit_hash }} ${{ github.ref_name }} ${{ github.run_number }}
 
   Deploy-Android:
     permissions: read-all
